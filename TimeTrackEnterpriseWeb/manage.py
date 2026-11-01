@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Django management entry point for SmartAttendance."""
+"""Django management entry point for TimeTrackEnterprise."""
 from __future__ import annotations
 
 import os

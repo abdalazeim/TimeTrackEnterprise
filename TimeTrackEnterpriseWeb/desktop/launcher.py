@@ -43,7 +43,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="SmartAttendance",
+        prog="TimeTrackEnterprise",
         description="TimeTrack Enterprise desktop server",
     )
     parser.add_argument(
@@ -361,7 +361,7 @@ def _fatal(message: str) -> None:
 
         root = tkinter.Tk()
         root.withdraw()
-        messagebox.showerror("SmartAttendance", message)
+        messagebox.showerror("TimeTrackEnterprise", message)
         root.destroy()
     except Exception:  # pragma: no cover - no tkinter in the environment
         print(message, file=sys.stderr)
@@ -427,7 +427,7 @@ def main(argv: list[str] | None = None) -> int:
             host=args.host,
             port=port,
             threads=int(os.environ.get("ATTENDANCE_THREADS", "8")),
-            ident="SmartAttendance",
+            ident="TimeTrackEnterprise",
         )
         return 0
     except KeyboardInterrupt:  # pragma: no cover - interactive shutdown

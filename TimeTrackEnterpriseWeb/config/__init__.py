@@ -1,1 +1,1 @@
-"Django configuration package for SmartAttendance."
+"Django configuration package for TimeTrackEnterprise."

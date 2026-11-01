@@ -1,16 +1,17 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+title TimeTrackEnterprise Installer Build
 
-if not exist "dist\SmartAttendance.exe" (
-    echo [ERROR] dist\SmartAttendance.exe was not found.
+if not exist "dist\TimeTrackEnterprise.exe" (
+    echo [ERROR] dist\TimeTrackEnterprise.exe was not found.
     echo Run build.bat first, then run this script again.
     pause
     exit /b 1
 )
 
-if not exist "installer\SmartAttendance.iss" (
-    echo [ERROR] installer\SmartAttendance.iss was not found.
+if not exist "installer\TimeTrackEnterprise.iss" (
+    echo [ERROR] installer\TimeTrackEnterprise.iss was not found.
     pause
     exit /b 1
 )
@@ -26,16 +27,16 @@ if not exist "%ISCC%" (
 )
 
 echo [1/1] Compiling the distribution setup...
-"%ISCC%" "installer\SmartAttendance.iss"
+"%ISCC%" "installer\TimeTrackEnterprise.iss"
 if errorlevel 1 goto :error
 
-if not exist "dist\SmartAttendance_Setup_1.1.20.exe" (
+if not exist "dist\TimeTrackEnterprise_Setup_1.1.20.exe" (
     echo [ERROR] The setup executable was not produced.
     goto :error
 )
 
 echo.
-echo Build complete: dist\SmartAttendance_Setup_1.1.20.exe
+echo Build complete: dist\TimeTrackEnterprise_Setup_1.1.20.exe
 exit /b 0
 
 :error

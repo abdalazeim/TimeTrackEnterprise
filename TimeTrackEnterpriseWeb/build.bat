@@ -1,6 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+title TimeTrackEnterprise Build
 
 if not exist ".venv\Scripts\python.exe" (
     echo [1/4] Creating the Python virtual environment...
@@ -17,12 +18,12 @@ echo [3/4] Generating the application icon...
 ".venv\Scripts\python.exe" scripts\make_icon.py
 if errorlevel 1 goto :error
 
-echo [4/4] Building dist\SmartAttendance.exe...
+echo [4/4] Building dist\TimeTrackEnterprise.exe...
 ".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean attendance.spec
 if errorlevel 1 goto :error
 
 echo.
-echo Build complete: dist\SmartAttendance.exe
+echo Build complete: dist\TimeTrackEnterprise.exe
 exit /b 0
 
 :error

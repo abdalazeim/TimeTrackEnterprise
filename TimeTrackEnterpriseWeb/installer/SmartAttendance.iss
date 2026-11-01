@@ -1,13 +1,13 @@
 ﻿; Inno Setup 6.4+ — Smart Student Attendance distribution script
-; Build with: build_setup.bat  (or ISCC.exe installer\SmartAttendance.iss)
+; Build with: build_setup.bat  (or ISCC.exe installer\TimeTrackEnterprise.iss)
 
 #define MyAppName "نظام متابعة الحضور"
 #define MyAppVersion "1.1.20"
 #define MyAppPublisher "د. بوزويرة عزيز (shamildev)"
-#define MyAppExeName "SmartAttendance.exe"
+#define MyAppExeName "TimeTrackEnterprise.exe"
 #define MyAppCopyright "© 2026 د. بوزويرة عزيز — shamildev. جميع الحقوق محفوظة."
 #ifndef SourceExe
-  #define SourceExe "..\dist\SmartAttendance.exe"
+  #define SourceExe "..\dist\TimeTrackEnterprise.exe"
 #endif
 
 [Setup]
@@ -24,6 +24,7 @@ VersionInfoDescription=مثبت {#MyAppName}
 VersionInfoCopyright={#MyAppCopyright}
 VersionInfoProductName={#MyAppName}
 VersionInfoProductVersion={#MyAppVersion}
+; Preserve the legacy install directory for data and upgrade compatibility.
 DefaultDirName={autopf}\SmartAttendance
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
@@ -33,7 +34,7 @@ MinVersion=10.0
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\dist
-OutputBaseFilename=SmartAttendance_Setup_{#MyAppVersion}
+OutputBaseFilename=TimeTrackEnterprise_Setup_{#MyAppVersion}
 SetupIconFile=..\build_assets\attendance.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallDisplayName={#MyAppName}

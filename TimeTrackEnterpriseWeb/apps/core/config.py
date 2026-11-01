@@ -5,7 +5,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-APP_NAME = "SmartAttendance"
+APP_NAME = "TimeTrackEnterprise"
 APP_VERSION = "1.1.20"
 COLOR_THEMES = (
     "emerald",
@@ -18,7 +18,7 @@ COLOR_THEMES = (
     "slate",
 )
 DEFAULT_COLOR_THEME = "emerald"
-APP_TITLE = "نظام متابعة الحضور"
+APP_TITLE = "TimeTrackEnterprise"
 APP_SUBTITLE = "الحضور بالباركود وإشعار الأولياء"
 APP_AUTHOR = "د. بوزويرة عزيز"
 APP_AUTHOR_LATIN = "Dr. Bouzouira Aziz"
@@ -46,14 +46,14 @@ ROLE_LABELS = {
 
 APP_TRANSLATIONS = {
     "en": {
-        "title": "Smart Attendance System",
+        "title": "TimeTrackEnterprise",
         "subtitle": "Barcode attendance & parent notifications",
         "author": "Dr. Bouzouira Aziz",
         "location": "Saida, Algeria",
         "dedication": "A continuous charity in memory of my late father, Bouzouira Kada.",
     },
     "fr": {
-        "title": "Système de suivi de présence",
+        "title": "TimeTrackEnterprise",
         "subtitle": "Présence par code-barres et notifications aux parents",
         "author": "Dr. Bouzouira Aziz",
         "location": "Saïda, Algérie",

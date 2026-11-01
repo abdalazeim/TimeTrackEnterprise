@@ -92,11 +92,10 @@ class DesktopAdminLoopbackMiddleware:
     def __call__(self, request):
         path = getattr(request, "path_info", "") or ""
         if path.startswith("/admin/"):
-            remote = request.META.get("REMOTE_ADDR") or ""
-            forwarded = (
-                (request.META.get("HTTP_X_FORWARDED_FOR") or "").split(",")[0].strip()
-            )
-            address = forwarded or remote
+            # The desktop launcher is directly exposed to the LAN, not behind
+            # a trusted proxy. A caller can forge X-Forwarded-For, so use the
+            # socket peer address for this loopback-only restriction.
+            address = request.META.get("REMOTE_ADDR") or ""
             try:
                 ip = ipaddress.ip_address(address)
             except ValueError:

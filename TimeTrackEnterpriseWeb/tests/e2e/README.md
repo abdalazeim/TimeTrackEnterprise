@@ -24,9 +24,9 @@ Run the desktop build (`run.bat` or `dist/TimeTrackEnterprise.exe`) and verify:
 5. **Reports** — daily/monthly JSON, XLSX export and the print view.
 6. **Desktop lifecycle** — the launcher opens the browser, the data folder
    (`data/`, or `--data-dir`) keeps the database, and `/health/` answers.
-7. **Synchronisation** — pair a device from **الإعدادات → المزامنة**, push a
-   change from `GDS-Android-Template`, pull it on a second desktop, then
-   resolve an artificially created conflict.
+7. **Android companion** — use a manager-issued staff code to sign in, sync
+   the offline roster, submit a scan, and open the parent portal with a
+   student's national ID against the same server URL.
 
 ## Camera-scan test
 

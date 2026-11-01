@@ -3,9 +3,7 @@
 
 #define MyAppName "TimeTrackEnterprise"
 #define MyAppVersion "1.1.20"
-#define MyAppPublisher "د. بوزويرة عزيز (shamildev)"
 #define MyAppExeName "TimeTrackEnterprise.exe"
-#define MyAppCopyright "© 2026 د. بوزويرة عزيز — shamildev. جميع الحقوق محفوظة."
 #ifndef SourceExe
   #define SourceExe "..\dist\TimeTrackEnterprise.exe"
 #endif
@@ -15,13 +13,8 @@ AppId={{B6D3AC6E-7E2A-4A88-9B15-3C0F2D7F4E91}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
-AppPublisher={#MyAppPublisher}
-AppCopyright={#MyAppCopyright}
-AppComments=صدقة عن والدي المرحوم بوزويرة قادة
 VersionInfoVersion=1.1.20.0
-VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription=مثبت {#MyAppName}
-VersionInfoCopyright={#MyAppCopyright}
 VersionInfoProductName={#MyAppName}
 VersionInfoProductVersion={#MyAppVersion}
 ; UsePreviousAppDir keeps existing installations and their data in place.

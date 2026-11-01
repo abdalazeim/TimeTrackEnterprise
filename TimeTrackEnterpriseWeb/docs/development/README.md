@@ -4,7 +4,7 @@
 
 * Python 3.11+ (3.13 recommended)
 * Node 20+ (only for the camera-scan test)
-* Flutter 3.24+ (optional, `GDS-Android-Template`)
+* Flutter 3.24+ (optional, companion at `../TimeTrackEnterpriseAndroid`)
 
 ## Setup
 
@@ -47,6 +47,7 @@ Select one with `DJANGO_SETTINGS_MODULE` or
 | `ATTENDANCE_SECRET_KEY` | generated into `DATA_DIR/.secret_key` | signing/session key |
 | `ATTENDANCE_ALLOWED_HOSTS` | `localhost,127.0.0.1` | production hosts |
 | `ATTENDANCE_CSRF_TRUSTED_ORIGINS` | empty | comma-separated origins |
+| `ATTENDANCE_TRUST_X_REAL_IP` | `0` | trust `X-Real-IP` only behind a proxy that overwrites it |
 | `ATTENDANCE_SSL_REDIRECT`, `ATTENDANCE_HSTS_SECONDS` | `1`, `31536000` | HTTPS policy |
 | `ATTENDANCE_BACKGROUND_JOBS` | `1` | desktop scheduler on/off |
 | `ATTENDANCE_DISABLE_SCHEDULER` | `0` | disable workers |

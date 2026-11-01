@@ -13,6 +13,9 @@ folder differ.
 > The application stores everything in one SQLite file. Never point two
 > containers or two machines at the same database file over a network share.
 > Scale by giving each school its own instance, not by sharing one database.
+> Attendance uses the school timezone (`Africa/Algiers`). Set the host OS
+> timezone accordingly for non-Docker production deployments; the Docker image
+> sets `TZ=Africa/Algiers`.
 
 ## Environment variables
 
@@ -24,6 +27,7 @@ folder differ.
 | `ATTENDANCE_SECRET_KEY` | generated in `DATA_DIR/.secret_key` | sessions and signing (required in Docker) |
 | `ATTENDANCE_ALLOWED_HOSTS` | `localhost,127.0.0.1` | comma-separated host names |
 | `ATTENDANCE_CSRF_TRUSTED_ORIGINS` | empty | comma-separated `https://…` origins |
+| `ATTENDANCE_TRUST_X_REAL_IP` | `0` | trust `X-Real-IP` only behind a proxy that overwrites it |
 | `ATTENDANCE_SSL_REDIRECT` | `1` (production) | set to `0` when Nginx terminates TLS |
 | `ATTENDANCE_HSTS_SECONDS` | `31536000` | HSTS lifetime |
 | `ATTENDANCE_BACKGROUND_JOBS` | `1` | period closures, SMS retries, update checks |
@@ -222,12 +226,37 @@ error instead of duplicating work.
 
 ## Android client
 
-`GDS-Android-Template/` is a minimal Flutter client for `/api/sync/`. Pairing
-flow:
+`TimeTrackEnterpriseAndroid/` is the Flutter companion. For a desktop/LAN
+server, start the desktop launcher on the school computer, use the printed
+`http://<LAN-IP>:<PORT>` address, and keep the phone on the same reachable LAN.
+The current Android manifest does not declare cleartext HTTP access. If Android
+rejects that LAN URL, this build needs a reviewed app-level LAN transport
+configuration or a trusted HTTPS endpoint on the school network; entering the
+IP alone cannot override Android's transport policy.
+For hosting, use the public HTTPS origin (for example
+`https://attendance.example.org`) and include its hostname in
+`ATTENDANCE_ALLOWED_HOSTS`; the Android client rejects public HTTP URLs and
+redirects.
+
+The companion uses `/api/mobile/*` for staff-code login, parent login, the
+staff/parent portals, offline roster downloads, and idempotent scan uploads.
+The administrator issues staff codes from **الإعدادات → المستخدمون**; a parent
+uses the student's 12-digit national ID. See the mobile API section in
+`docs/api/README.md` for request and authentication details.
+
+The app also hosts a separate HTTP gateway on the phone for the desktop SMS and
+scanner integrations. It is reachable from the desktop when both devices share
+a LAN. A remote hosted server cannot initiate a connection to a phone's private
+LAN address; hosted SMS through the phone gateway requires a VPN/tunnel or a
+future outbound polling/relay flow. The parent/staff portal and scan sync do
+work from Android to a hosted HTTPS server.
+
+The separate `/api/sync/*` protocol is a different, generic data-sync feature;
+it is not the authentication or roster API used by the TimeTrack companion.
+Its pairing flow is:
 
 1. **الإعدادات → المزامنة** → register a device; the token is shown once.
-2. Enter the server URL (`https://attendance.example.org`) and the token in
-   the Flutter app.
+2. Enter the server URL and token in a client implementing `/api/sync/*`.
 3. Push a change, then pull on another device or in the browser.
 4. Resolve any conflict from the desktop **الإعدادات → المزامنة** screen.
 

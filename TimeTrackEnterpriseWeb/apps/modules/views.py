@@ -260,7 +260,7 @@ def help_page():
 def about_page():
     return render_template(
         "about.html",
-        **_page_context("about", "حول التطبيق", "معلومات الإصدار والمطوّر والإهداء"),
+        **_page_context("about", "حول التطبيق", "تفاصيل النظام والإصدار"),
     )
 
 

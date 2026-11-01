@@ -50,6 +50,10 @@ def _secret_key() -> str:
 
 SECRET_KEY = _secret_key()
 
+# Only enable this behind a reverse proxy that overwrites X-Real-IP with the
+# connecting client's address. Direct deployments must use REMOTE_ADDR.
+TRUST_X_REAL_IP = os.environ.get("ATTENDANCE_TRUST_X_REAL_IP", "0") == "1"
+
 DEBUG = False
 ALLOWED_HOSTS: list[str] = ["*"]
 
@@ -214,9 +218,6 @@ MAX_CONTENT_LENGTH = 30 * 1024 * 1024
 APP_VERSION = legacy_config.APP_VERSION
 APP_TITLE = legacy_config.APP_TITLE
 APP_SUBTITLE = legacy_config.APP_SUBTITLE
-APP_AUTHOR = legacy_config.APP_AUTHOR
-APP_LOCATION = legacy_config.APP_LOCATION
-APP_REPO_URL = legacy_config.APP_REPO_URL
 UPDATE_FEED_URL = legacy_config.UPDATE_FEED_URL
 UPDATE_PUBLIC_KEY = legacy_config.UPDATE_PUBLIC_KEY
 UPDATE_CHECK_INTERVAL = legacy_config.UPDATE_CHECK_INTERVAL

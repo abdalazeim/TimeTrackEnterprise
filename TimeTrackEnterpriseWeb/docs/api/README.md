@@ -19,6 +19,7 @@ endpoints. The tables below are the complete inventory.
 | Caching | `Cache-Control: no-store` on `/api/` |
 | CSRF | Session mutations require `X-Requested-With: StudentAttendance` |
 | Device auth | `/api/sync/*` accepts `X-Device-Token` instead of a session |
+| Companion auth | `/api/mobile/*` uses signed staff, device, or parent bearer tokens |
 | Trailing slash | Legacy routes: no slash. Native routes: slash |
 
 Error codes: `auth_required` (401), `forbidden` (403), `csrf` (403),
@@ -27,6 +28,11 @@ Error codes: `auth_required` (401), `forbidden` (403), `csrf` (403),
 
 The browser session is also available to clients through
 `GET /api/accounts/me/`.
+
+The Flutter companion API has its own signed bearer-token contract under
+`/api/mobile/`. It is documented below; unlike the generic `/api/sync/`
+protocol, it handles staff/parent login, offline attendance scans, and portal
+data. The current OpenAPI file does not yet describe every mobile response.
 
 ## Health and core
 
@@ -128,6 +134,67 @@ The browser session is also available to clients through
 | GET | `/api/scanner/phones` | user | Paired phones |
 | POST | `/api/scanner/phones/pair` | user | Pair a phone |
 | DELETE | `/api/scanner/phones/<id>` | user | Revoke a phone |
+
+## TimeTrack Android companion
+
+Mobile paths have **no trailing slash**. JSON success responses contain
+`ok: true`; failures contain `ok: false` and an `error` object. All Flutter
+requests send `X-Requested-With: StudentAttendance`; the Android API client
+rejects redirects and validates the server URL before connecting.
+
+| Method | Path | Authentication | Purpose |
+| --- | --- | --- | --- |
+| POST | `/api/mobile/hello` | Public | Probe the server and return school metadata |
+| POST | `/api/mobile/staff-codes` | Web admin session + request header | Issue or rotate one 8-digit employee code |
+| POST | `/api/mobile/pair` | Active staff code | Login to the staff portal; role is `admin` or `employee` |
+| POST | `/api/mobile/login-code` | Active staff code | Register/authorize a scanner device and return bearer + refresh secret |
+| POST | `/api/mobile/devices/session` | Device ID + refresh secret | Refresh a scanner bearer token |
+| GET | `/api/mobile/offline/roster?since=<version>` | Device bearer | Download active students and periods; unchanged versions return metadata only |
+| POST | `/api/mobile/scans/sync` | Device bearer | Upload up to 300 scans; `(device_id, client_id)` makes retries idempotent |
+| GET | `/api/mobile/portal/dashboard` | Staff bearer | Attendance dashboard and recent records |
+| POST | `/api/mobile/parent/login` | 12-digit student national ID | Create a parent portal bearer session |
+| GET | `/api/mobile/parent/me` | Parent bearer | Child and school profile |
+| GET | `/api/mobile/parent/attendance?days=30` | Parent bearer | Attendance history (`days` is clamped to 1–365) |
+| GET | `/api/mobile/parent/notifications?since_id=0` | Parent bearer | Unread attendance notifications and next cursor |
+| POST | `/api/mobile/parent/notifications/read` | Parent bearer | Mark owned notification IDs as read |
+
+The response fields consumed by the Flutter client are:
+
+- `/hello`: `registered`, `server.school_name`, `server.academic_year`.
+- `/staff-codes`: `code`, `expires_at`, `user`, `message`.
+- `/pair`: `token`, `user` (`id`, `username`, `display_name`, `role`,
+  `role_label`), and `server`.
+- `/login-code` and `/devices/session`: `token`, `device`, `user`, `server`;
+  initial device login also returns `device_secret` and `approval_required`.
+- `/offline/roster`: `version`, `unchanged`, `server_date`, school metadata,
+  and, when changed, `students` and `periods`.
+- `/scans/sync`: `summary` (`processed`, `duplicates`, `rejected`), per-scan
+  `results` (`client_id`, `action`, `message`, `student`, `attendance`), and
+  server date/time.
+- `/portal/dashboard`: `dashboard` with date, student and attendance totals,
+  plus up to 20 recent attendance rows.
+- Parent routes: `/login` returns `token`, `parent`, and `server`; `/me` returns
+  `parent`; `/attendance` returns `attendance`, `days`, and `student_nin`;
+  `/notifications` returns `notifications` and `cursor`; `/notifications/read`
+  returns `marked`.
+
+Issuing a new staff code revokes the previous code for that account; the active
+8-digit code remains reusable until replaced or expired (one year). Staff bearer
+tokens, device bearer tokens, and parent bearer tokens are distinct and expire
+after 30 days. Scanner devices refresh with their stored secret.
+Login attempts are rate-limited by client address to 10 attempts per 15 minutes
+for each login scope. When deployed behind a reverse proxy, enable
+`ATTENDANCE_TRUST_X_REAL_IP=1` only if the proxy overwrites `X-Real-IP`; the
+Docker/Nginx stack does this and the web container is not publicly published.
+Never enable it for a direct server that accepts client traffic itself.
+
+Hosted Android clients must use HTTPS. The current Android manifest does not
+declare cleartext HTTP access, so the local desktop URL requires a reviewed
+Android LAN transport configuration or a trusted HTTPS endpoint. The phone's
+local SMS/scan gateway is a separate inbound service: a desktop on the same LAN
+can reach it, but a hosted server cannot reach a phone's private address without
+VPN/tunneling or an outbound relay design. FCM push delivery is not implemented;
+the app reads stored notifications when opened.
 
 ## Accounts
 

@@ -475,7 +475,6 @@ def _config_from_settings() -> dict[str, Any]:
         "UPDATES_DIR": str(getattr(settings, "UPDATES_DIR", data_dir / "updates")),
         "SECRET_KEY": settings.SECRET_KEY,
         "APP_VERSION": getattr(settings, "APP_VERSION", legacy_config.APP_VERSION),
-        "APP_REPO_URL": getattr(settings, "APP_REPO_URL", legacy_config.APP_REPO_URL),
         "UPDATE_FEED_URL": getattr(settings, "UPDATE_FEED_URL", legacy_config.UPDATE_FEED_URL),
         "UPDATE_PUBLIC_KEY": getattr(settings, "UPDATE_PUBLIC_KEY", legacy_config.UPDATE_PUBLIC_KEY),
         "UPDATE_CHECK_INTERVAL": getattr(

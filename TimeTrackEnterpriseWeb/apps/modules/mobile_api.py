@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import ipaddress
 import json
 import re
 import secrets
@@ -119,9 +120,17 @@ def _public_user(row) -> dict:
 
 
 def _client_address(request) -> str:
-    # Do not trust forwarded headers here: this is a LAN application and the
-    # login limiter must not be bypassable by supplying X-Forwarded-For.
-    return request.META.get("REMOTE_ADDR", "unknown") or "unknown"
+    remote = request.META.get("REMOTE_ADDR", "unknown") or "unknown"
+    # Reverse proxies must overwrite this header and be explicitly enabled by
+    # deployment configuration. Never trust a caller-supplied forwarded header
+    # in direct/LAN mode.
+    if getattr(settings, "TRUST_X_REAL_IP", False):
+        forwarded = (request.META.get("HTTP_X_REAL_IP") or "").strip()
+        try:
+            return str(ipaddress.ip_address(forwarded))
+        except ValueError:
+            pass
+    return remote
 
 
 def _allow_login_attempt(conn, scope: str, address: str) -> bool:
@@ -429,7 +438,7 @@ def _scan_datetime(raw) -> datetime:
         raise ValueError("timestamp required")
     value = datetime.fromisoformat(raw.strip().replace("Z", "+00:00"))
     if timezone.is_aware(value):
-        value = value.astimezone().replace(tzinfo=None)
+        value = timezone.make_naive(value, timezone.get_default_timezone())
     now = _now()
     if value > now + timedelta(minutes=5) or value < now - timedelta(days=14):
         raise ValueError("timestamp out of accepted range")

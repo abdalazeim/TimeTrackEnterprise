@@ -22,6 +22,7 @@ tags:
   - name: slips
   - name: reports
   - name: sync
+  - name: mobile
 security:
   - sessionCookie: []
 components:
@@ -34,6 +35,10 @@ components:
       type: apiKey
       in: header
       name: X-Device-Token
+    mobileBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: Django signed token
     requestGuard:
       type: apiKey
       in: header
@@ -165,6 +170,219 @@ paths:
           description: Session user
         "401":
           $ref: "#/components/responses/Unauthorized"
+  /api/mobile/hello:
+    post:
+      tags: [mobile]
+      security: []
+      summary: Probe the companion API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_id]
+              properties:
+                device_id: {type: string, maxLength: 128}
+      responses:
+        "200": {description: Registration probe and school metadata}
+  /api/mobile/staff-codes:
+    post:
+      tags: [mobile]
+      security:
+        - sessionCookie: []
+          requestGuard: []
+      summary: Issue or rotate a staff login code
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id]
+              properties:
+                user_id: {type: integer}
+      responses:
+        "200": {description: One-time 8-digit code and expiry}
+        "403": {description: Admin session required}
+  /api/mobile/pair:
+    post:
+      tags: [mobile]
+      security: []
+      summary: Create a staff portal session with an active staff code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role, code]
+              properties:
+                role: {type: string, enum: [admin, employee]}
+                code: {type: string, pattern: "^[0-9]{8}$"}
+                device_id: {type: string, maxLength: 128}
+      responses:
+        "200": {description: Signed staff bearer token, user and school metadata}
+        "401": {description: Invalid or expired code}
+  /api/mobile/login-code:
+    post:
+      tags: [mobile]
+      security: []
+      summary: Register a scanner device using an active staff code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_id, passcode]
+              properties:
+                device_id: {type: string, maxLength: 128}
+                passcode: {type: string, pattern: "^[0-9]{8}$"}
+                device_name: {type: string, maxLength: 120}
+                platform: {type: string, maxLength: 40}
+                app_version: {type: string, maxLength: 40}
+      responses:
+        "200": {description: Device bearer token, refresh secret, user and school data}
+        "401": {description: Invalid or expired code}
+  /api/mobile/devices/session:
+    post:
+      tags: [mobile]
+      security: []
+      summary: Refresh a scanner device session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [device_id, secret]
+              properties:
+                device_id: {type: string}
+                secret: {type: string}
+                device_name: {type: string}
+                app_version: {type: string}
+      responses:
+        "200": {description: Refreshed device bearer token}
+        "401": {description: Unknown device or refresh secret}
+  /api/mobile/offline/roster:
+    get:
+      tags: [mobile]
+      security:
+        - mobileBearer: []
+      summary: Download active students and periods for offline scanning
+      parameters:
+        - {name: since, in: query, schema: {type: string}, description: Previously returned roster version}
+      responses:
+        "200": {description: Roster or unchanged metadata}
+        "401": {description: Valid device bearer required}
+  /api/mobile/scans/sync:
+    post:
+      tags: [mobile]
+      security:
+        - mobileBearer: []
+      summary: Upload an idempotent batch of offline scans
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scans]
+              properties:
+                device_id: {type: string}
+                scans:
+                  type: array
+                  maxItems: 300
+                  items:
+                    type: object
+                    required: [client_id, code, at]
+                    properties:
+                      client_id: {type: string, maxLength: 128}
+                      code: {type: string, maxLength: 128}
+                      at: {type: string, format: date-time}
+                      period_id: {type: integer}
+      responses:
+        "200": {description: Per-scan results and processed/duplicate/rejected counts}
+        "401": {description: Valid device bearer required}
+  /api/mobile/portal/dashboard:
+    get:
+      tags: [mobile]
+      security:
+        - mobileBearer: []
+      summary: Read the staff attendance dashboard
+      responses:
+        "200": {description: Dashboard counters and recent attendance}
+        "401": {description: Valid staff bearer required}
+  /api/mobile/parent/login:
+    post:
+      tags: [mobile]
+      security: []
+      summary: Create a parent portal session using the student national ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: {type: string, pattern: "^[0-9]{12}$"}
+                device_id: {type: string, maxLength: 128}
+      responses:
+        "200": {description: Signed parent bearer token and student summary}
+        "401": {description: No active student matches the supplied ID}
+  /api/mobile/parent/me:
+    get:
+      tags: [mobile]
+      security:
+        - mobileBearer: []
+      summary: Read the linked student profile
+      responses:
+        "200": {description: Student and school profile}
+        "401": {description: Valid parent bearer required}
+  /api/mobile/parent/attendance:
+    get:
+      tags: [mobile]
+      security:
+        - mobileBearer: []
+      summary: Read the linked student's attendance history
+      parameters:
+        - {name: days, in: query, schema: {type: integer, minimum: 1, maximum: 365, default: 30}}
+      responses:
+        "200": {description: Attendance rows for the selected range}
+        "401": {description: Valid parent bearer required}
+  /api/mobile/parent/notifications:
+    get:
+      tags: [mobile]
+      security:
+        - mobileBearer: []
+      summary: Read unread attendance notifications after a cursor
+      parameters:
+        - {name: since_id, in: query, schema: {type: integer, minimum: 0, default: 0}}
+      responses:
+        "200": {description: Notifications and next cursor}
+        "401": {description: Valid parent bearer required}
+  /api/mobile/parent/notifications/read:
+    post:
+      tags: [mobile]
+      security:
+        - mobileBearer: []
+      summary: Mark notification rows for the linked student as read
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              properties:
+                ids: {type: array, maxItems: 200, items: {type: integer, minimum: 1}}
+      responses:
+        "200": {description: Number of owned notification IDs marked read}
+        "401": {description: Valid parent bearer required}
   /api/students:
     get:
       tags: [students]

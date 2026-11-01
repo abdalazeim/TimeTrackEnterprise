@@ -40,6 +40,9 @@ PUBLIC_PATHS = {
 # intercept those requests.
 DEVICE_TOKEN_PATHS = ("/api/sync/",)
 DEVICE_TOKEN_HEADER = "X-Device-Token"
+# The mobile companion has its own signed bearer-token authentication. Let its
+# login and data views validate requests instead of requiring a browser session.
+MOBILE_API_PREFIXES = ("/api/mobile/",)
 
 ADMIN_API_PREFIXES = ("/api/settings", "/api/uploads", "/api/users")
 ADMIN_API_PATHS = {
@@ -126,7 +129,8 @@ class AccountGateMiddleware:
         device_request = any(
             path.startswith(prefix) for prefix in DEVICE_TOKEN_PATHS
         ) and bool(request.headers.get(DEVICE_TOKEN_HEADER))
-        if not user and not device_request:
+        mobile_api_request = any(path.startswith(prefix) for prefix in MOBILE_API_PREFIXES)
+        if not user and not device_request and not mobile_api_request:
             return _deny("يجب تسجيل الدخول للمتابعة.", 401)
 
         if not device_request and _is_admin_api_request(path, request.method) and user.get("role") != "admin":

@@ -22,6 +22,8 @@ services:
       ATTENDANCE_DATA_DIR: /app/data
       ATTENDANCE_ALLOWED_HOSTS: ${ATTENDANCE_ALLOWED_HOSTS:-localhost,127.0.0.1}
       ATTENDANCE_CSRF_TRUSTED_ORIGINS: ${ATTENDANCE_CSRF_TRUSTED_ORIGINS:-}
+      # Nginx overwrites X-Real-IP and is the only published ingress to web.
+      ATTENDANCE_TRUST_X_REAL_IP: "1"
       ATTENDANCE_SECRET_KEY: ${ATTENDANCE_SECRET_KEY:?set ATTENDANCE_SECRET_KEY in .env}
       # Nginx performs the HTTP -> HTTPS redirect and sets X-Forwarded-Proto.
       ATTENDANCE_SSL_REDIRECT: "0"

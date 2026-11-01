@@ -13,13 +13,11 @@ New-Item -ItemType Directory -Force -Path $previewDir | Out-Null
 
 $Utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false
 
-# Brand palette (matches AppTheme.seed / AppTheme.accent)
-$Deep = [System.Drawing.Color]::FromArgb(255, 11, 27, 48)
-$GreenMid = [System.Drawing.Color]::FromArgb(255, 18, 56, 91)
-$Green = [System.Drawing.Color]::FromArgb(255, 36, 102, 155)
-$Gold = [System.Drawing.Color]::FromArgb(255, 72, 224, 178)
-$GoldLight = [System.Drawing.Color]::FromArgb(255, 134, 245, 213)
-$GoldDeep = [System.Drawing.Color]::FromArgb(255, 37, 190, 145)
+# Brand palette matches TimeTrackEnterpriseWeb/static/images/favicon.svg.
+$Deep = [System.Drawing.Color]::FromArgb(255, 16, 36, 64)
+$Green = [System.Drawing.Color]::FromArgb(255, 7, 111, 110)
+$Mint = [System.Drawing.Color]::FromArgb(255, 184, 245, 224)
+$Check = [System.Drawing.Color]::FromArgb(255, 8, 59, 70)
 $White = [System.Drawing.Color]::White
 $Transparent = [System.Drawing.Color]::FromArgb(0, 0, 0, 0)
 
@@ -46,44 +44,22 @@ function Draw-Background {
     $path = [System.Drawing.Drawing2D.GraphicsPath]::new()
     $path.AddEllipse(0, 0, 1024, 1024)
   } else {
-    $path = New-RoundedPath 0 0 1024 1024 208
+    $path = New-RoundedPath 16 16 992 992 256
   }
 
   $brush = [System.Drawing.Drawing2D.LinearGradientBrush]::new(
-    [System.Drawing.PointF]::new(0, 1024),
-    [System.Drawing.PointF]::new(1024, 0),
+    [System.Drawing.PointF]::new(96, -70),
+    [System.Drawing.PointF]::new(925, 1090),
     $Deep,
     $Green
   )
-  $blend = New-Object System.Drawing.Drawing2D.ColorBlend -ArgumentList 3
-  $blend.Colors = [System.Drawing.Color[]]@($Deep, $GreenMid, $Green)
-  $blend.Positions = [single[]]@(0.0, 0.52, 1.0)
+  $blend = New-Object System.Drawing.Drawing2D.ColorBlend -ArgumentList 4
+  $blend.Colors = [System.Drawing.Color[]]@($Deep, $Deep, $Green, $Green)
+  $blend.Positions = [single[]]@(0.0, 0.116, 0.888, 1.0)
   $brush.InterpolationColors = $blend
   $G.FillPath($brush, $path)
-
-  # Soft diagonal sheen across the upper-left corner.
-  $state = $G.Save()
-  $G.SetClip($path)
-  $sheen = [System.Drawing.Drawing2D.LinearGradientBrush]::new(
-    [System.Drawing.PointF]::new(140, -220),
-    [System.Drawing.PointF]::new(900, 780),
-    [System.Drawing.Color]::FromArgb(30, 255, 255, 255),
-    [System.Drawing.Color]::FromArgb(0, 255, 255, 255)
-  )
-  $G.FillEllipse($sheen, -420, -640, 1500, 1200)
-  $G.Restore($state)
-
-  $border = [System.Drawing.Pen]::new([System.Drawing.Color]::FromArgb(46, 255, 255, 255), [single]4)
-  if ($Circle) {
-    $G.DrawEllipse($border, 5, 5, 1014, 1014)
-  } else {
-    $inner = New-RoundedPath 18 18 988 988 192
-    $G.DrawPath($border, $inner)
-    $inner.Dispose()
-  }
-  $border.Dispose()
   $brush.Dispose()
-  $sheen.Dispose()
+  $path.Dispose()
 }
 
 function Fill-TransparentPath {
@@ -106,7 +82,7 @@ function Fill-TransparentEllipse {
   $G.CompositingMode = $previous
 }
 
-# Emblem is authored around its own optical center (approx. -40, 32).
+# The clock and verified-status badge match the web favicon's geometry.
 function Draw-Emblem {
   param(
     [System.Drawing.Graphics]$G,
@@ -122,28 +98,47 @@ function Draw-Emblem {
   $G.TranslateTransform([float]$CX, [float]$CY)
   $G.ScaleTransform([float]$Scale, [float]$Scale)
 
-  $accent = if ($Mono) { $White } else { $Gold }
-  $ring = [System.Drawing.Pen]::new($White, 52)
+  $ring = [System.Drawing.Pen]::new($White, [single](56 * $Scale))
   $ring.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
   $ring.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
-  $G.DrawEllipse($ring, -275, -275, 550, 550)
+  $G.DrawEllipse($ring, -352, -352, 576, 576)
   $ring.Dispose()
 
-  $hands = [System.Drawing.Pen]::new($White, 58)
+  $ticks = [System.Drawing.Pen]::new($White, [single](40 * $Scale))
+  $ticks.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $ticks.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $G.DrawLine($ticks, -64, -352, -64, -288)
+  $G.DrawLine($ticks, 224, -64, 160, -64)
+  $G.DrawLine($ticks, -64, 224, -64, 160)
+  $G.DrawLine($ticks, -352, -64, -288, -64)
+  $ticks.Dispose()
+
+  $hands = [System.Drawing.Pen]::new($White, [single](56 * $Scale))
   $hands.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
   $hands.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
-  $G.DrawLine($hands, 0, -160, 0, 0)
-  $G.DrawLine($hands, 0, 0, 118, 72)
+  $G.DrawLine($hands, -64, -64, 112, -240)
+  $G.DrawLine($hands, -64, -64, -224, -224)
   $hands.Dispose()
 
-  $check = [System.Drawing.Pen]::new($accent, 64)
+  $dot = [System.Drawing.SolidBrush]::new($White)
+  $G.FillEllipse($dot, -104, -104, 80, 80)
+  $dot.Dispose()
+
+  if (-not $Mono) {
+    $badge = [System.Drawing.SolidBrush]::new($Mint)
+    $G.FillEllipse($badge, 80, 80, 320, 320)
+    $badge.Dispose()
+  }
+
+  $accent = if ($Mono) { $White } else { $Check }
+  $check = [System.Drawing.Pen]::new($accent, [single](43.2 * $Scale))
   $check.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
   $check.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
   $check.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
   $points = [System.Drawing.PointF[]]@(
-    [System.Drawing.PointF]::new(-115, 108),
-    [System.Drawing.PointF]::new(-35, 185),
-    [System.Drawing.PointF]::new(145, 5)
+    [System.Drawing.PointF]::new(168, 240),
+    [System.Drawing.PointF]::new(217.6, 289.6),
+    [System.Drawing.PointF]::new(313.6, 180.8)
   )
   $G.DrawLines($check, $points)
   $check.Dispose()

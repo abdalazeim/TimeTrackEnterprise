@@ -140,19 +140,22 @@ class _GatewayScannerPageState extends ConsumerState<GatewayScannerPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 14),
-                AppCard(
-                  padding: EdgeInsets.zero,
-                  clipBehavior: Clip.antiAlias,
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: MobileScanner(
-                      controller: _camera,
-                      onDetect: (capture) {
-                        final value = capture.barcodes.isEmpty
-                            ? null
-                            : capture.barcodes.first.rawValue;
-                        if (value != null) unawaited(_acceptCode(value));
-                      },
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: AppCard(
+                    padding: EdgeInsets.zero,
+                    border: false,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: MobileScanner(
+                        controller: _camera,
+                        onDetect: (capture) {
+                          final value = capture.barcodes.isEmpty
+                              ? null
+                              : capture.barcodes.first.rawValue;
+                          if (value != null) unawaited(_acceptCode(value));
+                        },
+                      ),
                     ),
                   ),
                 ),

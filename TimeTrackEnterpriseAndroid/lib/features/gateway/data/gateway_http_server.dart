@@ -92,8 +92,7 @@ class GatewayHttpServer {
   Future<void> _handle(HttpRequest request) async {
     final userAgent = request.headers.value(HttpHeaders.userAgentHeader);
     final clientApp = request.headers.value('x-client-app');
-    if ((clientApp != null &&
-            clientApp.toLowerCase() == 'smartattendance') ||
+    if ((clientApp != null && clientApp.toLowerCase() == 'smartattendance') ||
         (userAgent != null && userAgent.startsWith('SmartAttendance/'))) {
       _onPcSeen?.call(userAgent);
     }
@@ -159,7 +158,7 @@ class GatewayHttpServer {
       if (phone == null) {
         throw const _HttpError(400, 'Invalid phone number');
       }
-      final message = _string(body['message'] ?? body['text']);
+      final message = _string(body['message'] ?? body['text']) ?? '';
       if (message.trim().isEmpty) {
         throw const _HttpError(400, 'Message is empty');
       }
@@ -259,7 +258,7 @@ class GatewayHttpServer {
       );
     }
 
-    final pin = _string(body['pin']).trim();
+    final pin = (_string(body['pin']) ?? '').trim();
     if (!_isFourDigits(pin) || !_constantTimeEquals(pairPin, pin)) {
       _recordPairFailure();
       throw const _HttpError(401, 'Invalid pairing code');
@@ -354,7 +353,8 @@ class GatewayHttpServer {
     }
     response
       ..statusCode = status
-      ..headers.contentType = ContentType('application', 'json', charset: 'utf-8')
+      ..headers.contentType =
+          ContentType('application', 'json', charset: 'utf-8')
       ..headers.set(HttpHeaders.cacheControlHeader, 'no-store')
       ..headers.set('X-Content-Type-Options', 'nosniff')
       ..persistentConnection = false;
@@ -418,8 +418,7 @@ class GatewayHttpServer {
     return result;
   }
 
-  static bool _isFourDigits(String value) =>
-      RegExp(r'^\d{4}$').hasMatch(value);
+  static bool _isFourDigits(String value) => RegExp(r'^\d{4}$').hasMatch(value);
 
   static bool _constantTimeEquals(String left, String right) {
     final a = utf8.encode(left);
@@ -432,4 +431,3 @@ class GatewayHttpServer {
     return difference == 0;
   }
 }
-

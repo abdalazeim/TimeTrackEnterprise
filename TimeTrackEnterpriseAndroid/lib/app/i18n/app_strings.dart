@@ -385,7 +385,6 @@ class AppStrings {
   String get invalidChildCode => isArabic
       ? 'رمز الطالب يجب أن يتكوّن من 12 رقمًا.'
       : 'The child code must contain 12 digits.';
-  String get signIn => isArabic ? 'تسجيل الدخول' : 'Sign in';
   String get signingIn => isArabic ? 'جارٍ تسجيل الدخول…' : 'Signing in…';
   String get signOut => isArabic ? 'تسجيل الخروج' : 'Sign out';
   String get signOutPrompt => isArabic

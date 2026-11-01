@@ -1,4 +1,4 @@
-import '../domain/entities/scan_event.dart';
+import '../../domain/entities/scan_event.dart';
 
 /// In-memory ring of barcode scans served by the local HTTP gateway.
 ///
@@ -59,9 +59,7 @@ class ScanQueue {
   /// to 20 items, exactly like the reference implementation.
   List<ScanEvent> since(int after) {
     _prune(_clock());
-    return _items
-        .where((event) => event.seq > after)
-        .toList(growable: false);
+    return _items.where((event) => event.seq > after).toList(growable: false);
   }
 
   void clear() {
@@ -71,8 +69,7 @@ class ScanQueue {
   }
 
   void _prune(DateTime now) {
-    while (_items.isNotEmpty &&
-        now.difference(_items.first.at) > maxAge) {
+    while (_items.isNotEmpty && now.difference(_items.first.at) > maxAge) {
       _items.removeAt(0);
     }
   }

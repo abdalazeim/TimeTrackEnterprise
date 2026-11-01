@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,7 +63,9 @@ class _GatewayHomePageState extends ConsumerState<GatewayHomePage> {
                   HeroIconButton(
                     icon: Icons.refresh_rounded,
                     tooltip: strings.refresh,
-                    onTap: state.busy ? null : ctrl.refresh,
+                    onTap: () {
+                      if (!state.busy) unawaited(ctrl.refresh());
+                    },
                   ),
                 ],
               ),
@@ -988,7 +992,7 @@ class _QuickAction extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            IconBadge(icon: icon, tone: AppColors.primary, size: 42),
+            IconBadge(icon: icon, tone: AppColors.emerald, size: 42),
             const SizedBox(height: 10),
             Text(
               label,

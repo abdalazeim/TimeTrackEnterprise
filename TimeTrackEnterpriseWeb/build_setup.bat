@@ -10,8 +10,8 @@ if not exist "dist\TimeTrackEnterprise.exe" (
     exit /b 1
 )
 
-if not exist "installer\TimeTrackEnterprise.iss" (
-    echo [ERROR] installer\TimeTrackEnterprise.iss was not found.
+if not exist "installer\SmartAttendance.iss" (
+    echo [ERROR] installer\SmartAttendance.iss was not found.
     pause
     exit /b 1
 )
@@ -27,7 +27,7 @@ if not exist "%ISCC%" (
 )
 
 echo [1/1] Compiling the distribution setup...
-"%ISCC%" "installer\TimeTrackEnterprise.iss"
+"%ISCC%" "installer\SmartAttendance.iss"
 if errorlevel 1 goto :error
 
 if not exist "dist\TimeTrackEnterprise_Setup_1.1.20.exe" (

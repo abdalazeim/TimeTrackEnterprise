@@ -1,7 +1,7 @@
 ﻿; Inno Setup 6.4+ — Smart Student Attendance distribution script
-; Build with: build_setup.bat  (or ISCC.exe installer\TimeTrackEnterprise.iss)
+; Build with: build_setup.bat  (or ISCC.exe installer\SmartAttendance.iss)
 
-#define MyAppName "نظام متابعة الحضور"
+#define MyAppName "TimeTrackEnterprise"
 #define MyAppVersion "1.1.20"
 #define MyAppPublisher "د. بوزويرة عزيز (shamildev)"
 #define MyAppExeName "TimeTrackEnterprise.exe"

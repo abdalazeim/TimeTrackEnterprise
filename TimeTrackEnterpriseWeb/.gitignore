@@ -1,13 +1,23 @@
-# Runtime data — never publish student records, photos, logs, or databases
+# ---------------------------------------------------------------------------
+# Runtime data - never publish student records, photos, logs, or databases
+# ---------------------------------------------------------------------------
 data/
 data_*/
 .qa*/
 *.db
 *.db-wal
 *.db-shm
+*.sqlite3
 
+# Collected static files and uploaded media
+staticfiles/
+media/
+
+# ---------------------------------------------------------------------------
 # Local builds and rollback copies
+# ---------------------------------------------------------------------------
 .venv/
+venv/
 build/
 build_*/
 !build_assets/
@@ -15,27 +25,54 @@ dist/
 dist_*/
 backup/
 backups/
+migration_backup/
 tmp/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
 htmlcov/
 .coverage
+coverage.xml
 *.log
 
+# ---------------------------------------------------------------------------
 # Secrets and signing material
+# ---------------------------------------------------------------------------
 secrets/
 .env
 .env.*
 *.pem
 *.key
+!static/**/*.key
 
+# ---------------------------------------------------------------------------
+# Desktop / installer output
+# ---------------------------------------------------------------------------
+installer/Output/
+*.iss.bak
+
+# ---------------------------------------------------------------------------
+# Flutter (GDS-Android-Template)
+# ---------------------------------------------------------------------------
+GDS-Android-Template/.dart_tool/
+GDS-Android-Template/.packages
+GDS-Android-Template/build/
+GDS-Android-Template/.flutter-plugins
+GDS-Android-Template/.flutter-plugins-dependencies
+GDS-Android-Template/pubspec.lock
+
+# ---------------------------------------------------------------------------
 # Tutorial renders (keep scripts/subtitles)
+# ---------------------------------------------------------------------------
 tutorial/*.mp4
 tutorial/*.webm
 tutorial/frames/
 
+# ---------------------------------------------------------------------------
 # Editors and OS files
+# ---------------------------------------------------------------------------
 .idea/
 .vscode/
 .DS_Store

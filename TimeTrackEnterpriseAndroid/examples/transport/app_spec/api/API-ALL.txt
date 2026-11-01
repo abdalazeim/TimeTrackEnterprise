@@ -1,0 +1,44 @@
+Core 
+Org — الهيكل التنظيمي
+Method	رابط الاختبار
+GET	http://127.0.0.1:8000/api/v1/modules/org/cascade/
+GET	http://127.0.0.1:8000/api/v1/modules/org/companies/
+GET	http://127.0.0.1:8000/api/v1/modules/org/cities/
+GET	http://127.0.0.1:8000/api/v1/modules/org/locations/
+GET	http://127.0.0.1:8000/api/v1/modules/org/entities/
+GET	http://127.0.0.1:8000/api/v1/modules/org/departments/
+GET	http://127.0.0.1:8000/api/v1/modules/org/unit-types/
+Reports Center — مركز التقارير
+Method	رابط الاختبار
+GET	http://127.0.0.1:8000/api/v1/modules/reports_center/options/
+GET	http://127.0.0.1:8000/api/v1/modules/reports_center/report/
+Financial Analysis — التحليل المالي
+Method	رابط الاختبار
+GET	http://127.0.0.1:8000/api/v1/modules/financial_analysis/stats/
+GET	http://127.0.0.1:8000/api/v1/modules/financial_analysis/items/
+GET	http://127.0.0.1:8000/api/v1/modules/financial_analysis/options/
+GET	http://127.0.0.1:8000/api/v1/modules/financial_analysis/settings/
+Chart of Accounts — دليل الحسابات
+Method	رابط الاختبار
+GET	http://127.0.0.1:8000/api/v1/modules/chart_of_accounts/stats/
+GET	http://127.0.0.1:8000/api/v1/modules/chart_of_accounts/tree/
+GET	http://127.0.0.1:8000/api/v1/modules/chart_of_accounts/items/
+Accounting Reports — التقارير المحاسبية
+Method	رابط الاختبار
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reports/stats/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reports/trial-balance/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reports/ledger/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reports/income-statement/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reports/balance-sheet/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reports/cash-flow/
+Accounting Reviewer — المراجع المحاسبي
+Method	رابط الاختبار
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reviewer/stats/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reviewer/items/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reviewer/audit/options/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reviewer/audit/runs/
+GET	http://127.0.0.1:8000/api/v1/modules/accounting_reviewer/audit/settings/
+Sync — المزامنة مع Flutter
+Method	رابط الاختبار
+GET	http://127.0.0.1:8000/api/v1/sync/
+POST	http://127.0.0.1:8000/api/v1/sync/

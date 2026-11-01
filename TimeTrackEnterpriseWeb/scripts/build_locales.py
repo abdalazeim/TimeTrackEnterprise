@@ -12,12 +12,12 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = Path(__file__).resolve().parent / "locale_src"
-OUT = ROOT / "attendance_app" / "locales"
+OUT = ROOT / "apps" / "core" / "locales"
 LANGS = ("en", "fr")
 PLACEHOLDER = re.compile(r"\{(\d+)\}")
 ARABIC = re.compile(r"[\u0600-\u06FF]")
 STRING_LITERAL = re.compile(r"""(["'])((?:\\.|(?!\1).)*\1)""", re.DOTALL)
-SKIP_PARTS = ("/locales/", "/fonts/", "/vendor/")
+SKIP_PARTS = ("/locales/", "/fonts/", "/vendor/", "/__pycache__/", "/staticfiles/")
 
 
 def normalize(value: str) -> str:
@@ -73,7 +73,13 @@ def write_catalogs() -> dict[str, dict]:
 
 def candidate_sources() -> list[Path]:
     files = []
-    for base in (ROOT / "attendance_app", ROOT / "scripts"):
+    for base in (
+        ROOT / "apps",
+        ROOT / "config",
+        ROOT / "templates",
+        ROOT / "static" / "js",
+        ROOT / "scripts",
+    ):
         for pattern in ("*.py", "*.js", "*.html"):
             for path in base.rglob(pattern):
                 text = str(path).replace("\\", "/")

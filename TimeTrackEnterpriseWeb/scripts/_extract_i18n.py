@@ -2,6 +2,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 import re
 
+ROOT = Path(__file__).resolve().parents[1]
 AR = re.compile(r"[\u0600-\u06FF]")
 QUOTED = re.compile(r'''(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')''', re.S)
 
@@ -63,7 +64,7 @@ class FragCollector(HTMLParser):
 
 def main():
     out = set()
-    for path in sorted(Path("attendance_app/static/js").glob("*.js")):
+    for path in sorted((ROOT / "static" / "js").rglob("*.js")):
         source = path.read_text(encoding="utf-8")
         for match in re.finditer(r"`((?:[^`\\]|\\.|\\`)*)`", source, re.S):
             raw = match.group(1)
@@ -92,7 +93,7 @@ def main():
             if raw:
                 out.add(raw)
     print("js ui candidates", len(out))
-    Path("scripts/_i18n_js_text.txt").write_text("\n".join(sorted(out)) + "\n", encoding="utf-8")
+    (ROOT / "scripts" / "_i18n_js_text.txt").write_text("\n".join(sorted(out)) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

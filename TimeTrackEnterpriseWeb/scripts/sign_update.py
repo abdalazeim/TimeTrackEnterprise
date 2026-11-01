@@ -34,7 +34,12 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from attendance_app.services.update_service import canonical_payload, verify_manifest  # noqa: E402
+from apps.core.config import UPDATE_PUBLIC_KEY  # noqa: E402
+from apps.core.update_signing import (  # noqa: E402
+    UpdateSignatureError,
+    canonical_payload,
+    verify_manifest,
+)
 
 DEFAULT_KEY = ROOT / "secrets" / "update_signing_key.pem"
 
@@ -111,7 +116,10 @@ def main() -> int:
     signature = private_key.sign(canonical_payload(manifest))
     manifest["signature"] = base64.b64encode(signature).decode("ascii")
 
-    verified = verify_manifest(manifest)
+    try:
+        verified = verify_manifest(manifest, UPDATE_PUBLIC_KEY)
+    except UpdateSignatureError as error:
+        raise SystemExit(f"فشل التحقق من التوقيع بعد الإنشاء: {error}") from error
     if verified["version"] != manifest["version"]:
         raise SystemExit("فشل التحقق من التوقيع بعد الإنشاء.")
 

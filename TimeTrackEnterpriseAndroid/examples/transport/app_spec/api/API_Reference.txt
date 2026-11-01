@@ -1,0 +1,769 @@
+════════════════════════════════════════════════════════════════════════════════
+║                                                                            ║
+║           Goods Transportation System — Full API Reference                 ║
+║           Django + Render + Neon (PostgreSQL) + Flutter Android            ║
+║                                                                            ║
+║           Production Base URL:                                             ║
+║           https://goodstransportationsystem.onrender.com                   ║
+║                                                                            ║
+║           Version: v1  (recommended for Flutter)                           ║
+║           Total Unique Endpoints: 259                                      ║
+║           Last Updated: 2026-10-15                                         ║
+║                                                                            ║
+════════════════════════════════════════════════════════════════════════════════
+
+TABLE OF CONTENTS
+─────────────────
+  1.  Authentication & Users
+  2.  Synchronization (Offline-First)
+  3.  Transport — Shipments
+  4.  Transport — Trips
+  5.  Transport — Reference Data (Customers, Drivers, Vehicles, Goods, Routes, Branches, Agents)
+  6.  Transport — Financial (Payments, Expenses, Invoices, Ledgers)
+  7.  Transport — Dashboard & Reports
+  8.  Org — Structure (Companies, Cities, Locations, Entities, Departments, Unit Types)
+  9.  Chart of Accounts
+  10. Journal Entries
+  11. Budgets
+  12. Regions
+  13. Accounting Reports
+  14. Accounting Reviewer
+  15. Financial Analysis
+  16. Reports Center
+  17. Settings & System
+  18. Backup
+  19. Audit Logs
+  20. OpenAPI Schema & Docs
+
+
+════════════════════════════════════════════════════════════════════════════════
+  QUICK START FOR FLUTTER
+════════════════════════════════════════════════════════════════════════════════
+
+  BASE = "https://goodstransportationsystem.onrender.com"
+
+  1) Get a JWT token:
+     POST {BASE}/api/v1/auth/token/
+     Body: {"username": "...", "password": "..."}
+     Response: {"success":true,"message":"تم تسجيل الدخول بنجاح",
+                "data":{"access":"...","refresh":"...",
+                        "user":{"id":..,"username":"..."},
+                        "token_type":"Bearer"}}
+
+  2) Use it in every request:
+     Headers: {"Authorization": "Bearer <access>"}
+
+  3) Refresh when expired:
+     POST {BASE}/api/v1/auth/token/refresh/
+     Body: {"refresh": "<refresh_token>"}
+
+  4) Get user profile:
+     GET {BASE}/api/v1/auth/me
+
+  5) Sync data (pull/push):
+     GET  {BASE}/api/v1/sync/?cursor=<last_cursor>&models=shipment,trip
+     POST {BASE}/api/v1/sync/   Body: {"operations":[...]}
+
+  Response envelope (standard success shape):
+     {"success": true, "message": "...", "data": ..., "errors": null}
+
+  Errors use the SINGULAR key:
+     {"success": false, "error": "..."}
+
+  Some list/detail endpoints return bare arrays or keyed objects;
+  every such exception is listed in NOTES and beside its section.
+
+
+════════════════════════════════════════════════════════════════════════════════
+  1. AUTHENTICATION & USERS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ Method   │ Endpoint                                                     │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ POST     │ /api/v1/auth/token/              Obtain JWT (login)          │
+  │ POST     │ /api/v1/auth/token/refresh/      Refresh JWT                 │
+  │ GET      │ /api/v1/auth/me                 Current user profile         │
+  │ POST     │ /api/v1/auth/login              Web session login            │
+  │ POST     │ /api/v1/auth/logout             Web session logout           │
+  │ GET      │ /api/v1/auth/status             Login status check           │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/users                    List users                  │
+  │ PUT      │ /api/v1/users/<id>               Edit user                   │
+  │ DELETE   │ /api/v1/users/<id>               Delete user                 │
+  │ GET      │ /api/v1/users/groups             List groups                 │
+  │ PUT      │ /api/v1/users/groups/<id>        Edit group                  │
+  │ DELETE   │ /api/v1/users/groups/<id>        Delete group                │
+  │ GET      │ /api/v1/users/roles              List roles                  │
+  │ PUT      │ /api/v1/users/roles/<id>         Edit role                   │
+  │ DELETE   │ /api/v1/users/roles/<id>         Delete role                 │
+  │ POST     │ /api/v1/users/roles/seed         Seed default roles          │
+  │ GET      │ /api/v1/users/permissions        List permissions            │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+  Response shapes (measured — the web UI reads these exact keys):
+    GET /users, /users/groups, /users/roles  -> bare JSON array
+    GET /users/permissions                   -> {"permissions": [], "groups": []}
+    GET /auth/status                         -> {"logged_in": bool, "user": ... | null}
+    create/edit actions                      -> {"success": true, "message": "...", ...}
+
+
+════════════════════════════════════════════════════════════════════════════════
+  2. SYNCHRONIZATION (Offline-First for Flutter)
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ Method   │ Endpoint                                                     │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ GET      │ /api/v1/sync/                    Pull changes                │
+  │          │   ?cursor=<ISO8601>              Incremental cursor          │
+  │          │   &models=shipment,trip,customer Filter by model labels      │
+  │          │   &page=1                        Page number                 │
+  │          │   &page_size=500                 Max 500 per page            │
+  │ POST     │ /api/v1/sync/                    Push operations             │
+  │          │   Body: {"operations":[                                              │
+  │          │     {"operation_id":"<uuid>","kind":"shipment.advance",        │
+  │          │      "payload":{...}}]}                                          │
+  │ GET      │ /api/v1/capabilities/             Sync capabilities          │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  Pull Response:
+    {
+      "success": true,
+      "data": {
+        "changes": {
+          "customer":       [ { "id":"CU-0001", "name":"...", ... } ],
+          "driver":         [ ... ],
+          "vehicle":        [ ... ],
+          "goods":          [ ... ],
+          "route":          [ ... ],
+          "branch":         [ ... ],
+          "agent":          [ ... ],
+          "shipment":       [ ... ],
+          "trip":           [ ... ],
+          "payment":        [ ... ],
+          "expense":        [ ... ],
+          "invoice":        [ ... ],
+          "company":        [ ... ],
+          "city":           [ ... ],
+          "location":       [ ... ],
+          "operational_entity": [ ... ],
+          "department":     [ ... ],
+          "chart_of_accounts_item": [ ... ],
+          "journal_entries_item":   [ ... ],
+          "regions_item":   [ ... ]
+        },
+        "tombstones": [ { "model_label":"transport.Customer","object_pk":"CU-0001" } ],
+        "next_cursor": "2026-10-12T16:00:00+00:00",
+        "pagination": {
+          "shipment": {"page":1,"page_size":500,"total":42,"has_next":false,"has_previous":false}
+        }
+      }
+    }
+
+  Supported operation kinds (POST):
+    - shipment.advance
+    - shipment.create
+    - trip.advance
+
+  Sync Models (20 total):
+    customer, driver, vehicle, goods, route, branch, agent,
+    shipment, trip, payment, expense, invoice,
+    company, city, location, operational_entity, department,
+    chart_of_accounts_item, journal_entries_item, regions_item
+
+
+════════════════════════════════════════════════════════════════════════════════
+  3. TRANSPORT — SHIPMENTS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ Method   │ Endpoint                                                     │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ GET      │ /api/v1/modules/transport/shipments/                List     │
+  │ POST     │ /api/v1/modules/transport/shipments/add/           Create   │
+  │ GET      │ /api/v1/modules/transport/shipments/<ship_id>/     Detail   │
+  │ PUT      │ /api/v1/modules/transport/shipments/edit/<ship_id>/ Update  │
+  │ DELETE   │ /api/v1/modules/transport/shipments/<ship_id>/delete/ Delete│
+  │ POST     │ /api/v1/modules/transport/shipments/<ship_id>/advance/      │
+  │ POST     │ /api/v1/modules/transport/shipments/<ship_id>/next/         │
+  │ POST     │ /api/v1/modules/transport/shipments/<ship_id>/pod/          │
+  │ POST     │ /api/v1/modules/transport/shipments/<ship_id>/unload/       │
+  │ POST     │ /api/v1/modules/transport/shipments/<ship_id>/except/       │
+  │ POST     │ /api/v1/modules/transport/drafts/save/             Save draft│
+  │ POST     │ /api/v1/modules/transport/drafts/<ship_id>/submit/ Submit   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  Shipment status flow:
+    مستلمة → تم التحميل → في الطريق → تم التسليم
+    (exceptions: عالقة, ملغاة, مرجعة)
+
+
+════════════════════════════════════════════════════════════════════════════════
+  4. TRANSPORT — TRIPS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ Method   │ Endpoint                                                     │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ GET      │ /api/v1/modules/transport/trips/                   List     │
+  │ POST     │ /api/v1/modules/transport/trips/add/              Create   │
+  │ GET      │ /api/v1/modules/transport/trips/<trip_id>/        Detail   │
+  │ PUT      │ /api/v1/modules/transport/trips/<trip_id>/edit/   Update   │
+  │ DELETE   │ /api/v1/modules/transport/trips/<trip_id>/delete/ Delete   │
+  │ POST     │ /api/v1/modules/transport/trips/<trip_id>/advance/         │
+  │ POST     │ /api/v1/modules/transport/trips/<trip_id>/close/           │
+  │ POST     │ /api/v1/modules/transport/trips/<trip_id>/reopen/          │
+  │ POST     │ /api/v1/modules/transport/trips/<trip_id>/load/            │
+  │ POST     │ /api/v1/modules/transport/trips/<trip_id>/link/            │
+  │ GET      │ /api/v1/modules/transport/trips/<trip_id>/available/       │
+  │ GET      │ /api/v1/modules/transport/trips/<trip_id>/capacity/        │
+  │ POST     │ /api/v1/modules/transport/trips/load/<ship_id>/  Unload   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  5. TRANSPORT — REFERENCE DATA
+════════════════════════════════════════════════════════════════════════════════
+
+  CUSTOMERS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/customers/               List     │
+  │ POST     │ /api/v1/modules/transport/customers/add/          Create   │
+  │ PUT      │ /api/v1/modules/transport/customers/<ref_id>/     Update   │
+  │ DELETE   │ /api/v1/modules/transport/customers/<ref_id>/delete/ Delete│
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  DRIVERS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/drivers/                 List     │
+  │ POST     │ /api/v1/modules/transport/drivers/add/            Create   │
+  │ PUT      │ /api/v1/modules/transport/drivers/<ref_id>/       Update   │
+  │ DELETE   │ /api/v1/modules/transport/drivers/<ref_id>/delete/ Delete  │
+  │ POST     │ /api/v1/modules/transport/drivers/<ref_id>/status/ Status │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  VEHICLES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/vehicles/                List     │
+  │ POST     │ /api/v1/modules/transport/vehicles/add/           Create   │
+  │ PUT      │ /api/v1/modules/transport/vehicles/<ref_id>/      Update   │
+  │ DELETE   │ /api/v1/modules/transport/vehicles/<ref_id>/delete/ Delete │
+  │ POST     │ /api/v1/modules/transport/vehicles/<ref_id>/status/ Status│
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  FLEET
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/fleet/                  List     │
+  │ GET      │ /api/v1/modules/transport/fleet/options/          Options  │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  GOODS TYPES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/goods/                  List     │
+  │ POST     │ /api/v1/modules/transport/goods/add/             Create   │
+  │ PUT      │ /api/v1/modules/transport/goods/<ref_id>/        Update   │
+  │ DELETE   │ /api/v1/modules/transport/goods/<ref_id>/delete/ Delete   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  ROUTES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/routes/                  List     │
+  │ POST     │ /api/v1/modules/transport/routes/add/             Create   │
+  │ PUT      │ /api/v1/modules/transport/routes/<ref_id>/        Update   │
+  │ DELETE   │ /api/v1/modules/transport/routes/<ref_id>/delete/ Delete   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  BRANCHES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/branches/                List     │
+  │ POST     │ /api/v1/modules/transport/branches/add/           Create   │
+  │ PUT      │ /api/v1/modules/transport/branches/<ref_id>/      Update   │
+  │ DELETE   │ /api/v1/modules/transport/branches/<ref_id>/delete/ Delete │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  AGENTS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/agents/                  List     │
+  │ POST     │ /api/v1/modules/transport/agents/add/             Create   │
+  │ PUT      │ /api/v1/modules/transport/agents/<ref_id>/        Update   │
+  │ DELETE   │ /api/v1/modules/transport/agents/<ref_id>/delete/ Delete   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  COMPANY
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/company/                 Detail   │
+  │ POST     │ /api/v1/modules/transport/company/save/           Save     │
+  │ GET      │ /api/v1/modules/transport/credit/<ref_id>/        Credit   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  META
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/meta/                   Metadata │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  6. TRANSPORT — FINANCIAL
+════════════════════════════════════════════════════════════════════════════════
+
+  PAYMENTS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/payments/                List     │
+  │ POST     │ /api/v1/modules/transport/payments/add/           Create   │
+  │ DELETE   │ /api/v1/modules/transport/payments/<pay_id>/delete/ Delete │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  EXPENSES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/expenses/                List     │
+  │ POST     │ /api/v1/modules/transport/expenses/add/           Create   │
+  │ DELETE   │ /api/v1/modules/transport/expenses/<exp_id>/delete/ Delete │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  INVOICES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/invoices/                List     │
+  │ POST     │ /api/v1/modules/transport/invoices/purchase/      Purchase │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  LEDGERS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/ledgers/                 List     │
+  │ PUT      │ /api/v1/modules/transport/ledgers/<code>/         Update   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  VOUCHERS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ POST     │ /api/v1/modules/transport/vouchers/entry/          Entry    │
+  │ GET      │ /api/v1/modules/transport/vouchers/<kind>/journal/ Journal │
+  │ POST     │ /api/v1/modules/transport/vouchers/<kind>/journal/ Set    │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  7. TRANSPORT — DASHBOARD & REPORTS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/transport/dashboard/               Stats    │
+  │ GET      │ /api/v1/modules/transport/reports/                 Reports  │
+  │ GET      │ /api/v1/modules/transport/reports/top/             Top data │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  8. ORG — STRUCTURE
+════════════════════════════════════════════════════════════════════════════════
+
+  CASCADE (Full hierarchy)
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/org/cascade/                    All org    │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  COMPANIES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/org/companies/                  List       │
+  │ POST     │ /api/v1/modules/org/companies/create/           Create     │
+  │ GET      │ /api/v1/modules/org/companies/<id>/             Detail     │
+  │ PUT      │ /api/v1/modules/org/companies/<id>/update/      Update     │
+  │ DELETE   │ /api/v1/modules/org/companies/<id>/delete/      Delete     │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  CITIES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/org/cities/                     List       │
+  │ POST     │ /api/v1/modules/org/cities/create/              Create     │
+  │ GET      │ /api/v1/modules/org/cities/<id>/                Detail     │
+  │ PUT      │ /api/v1/modules/org/cities/<id>/update/         Update     │
+  │ DELETE   │ /api/v1/modules/org/cities/<id>/delete/         Delete     │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  LOCATIONS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/org/locations/                  List       │
+  │ POST     │ /api/v1/modules/org/locations/create/           Create     │
+  │ GET      │ /api/v1/modules/org/locations/<id>/             Detail     │
+  │ PUT      │ /api/v1/modules/org/locations/<id>/update/      Update     │
+  │ DELETE   │ /api/v1/modules/org/locations/<id>/delete/      Delete     │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  ENTITIES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/org/entities/                   List       │
+  │ POST     │ /api/v1/modules/org/entities/create/            Create     │
+  │ GET      │ /api/v1/modules/org/entities/<id>/              Detail     │
+  │ PUT      │ /api/v1/modules/org/entities/<id>/update/       Update     │
+  │ DELETE   │ /api/v1/modules/org/entities/<id>/delete/       Delete     │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  DEPARTMENTS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/org/departments/                List       │
+  │ POST     │ /api/v1/modules/org/departments/create/         Create     │
+  │ GET      │ /api/v1/modules/org/departments/<id>/           Detail     │
+  │ PUT      │ /api/v1/modules/org/departments/<id>/update/    Update     │
+  │ DELETE   │ /api/v1/modules/org/departments/<id>/delete/    Delete     │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  UNIT TYPES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/org/unit-types/                 List       │
+  │ POST     │ /api/v1/modules/org/unit-types/create/          Create     │
+  │ PUT      │ /api/v1/modules/org/unit-types/<id>/update/     Update     │
+  │ DELETE   │ /api/v1/modules/org/unit-types/<id>/delete/     Delete     │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  9. CHART OF ACCOUNTS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/chart_of_accounts/stats/          Stats    │
+  │ GET      │ /api/v1/modules/chart_of_accounts/tree/           Tree     │
+  │ GET      │ /api/v1/modules/chart_of_accounts/items/          List     │
+  │ POST     │ /api/v1/modules/chart_of_accounts/items/create/   Create  │
+  │ GET      │ /api/v1/modules/chart_of_accounts/items/<id>/     Detail  │
+  │ PUT      │ /api/v1/modules/chart_of_accounts/items/<id>/update/ Upd  │
+  │ DELETE   │ /api/v1/modules/chart_of_accounts/items/<id>/delete/ Del  │
+  │ POST     │ /api/v1/modules/chart_of_accounts/items/budget/   Budget  │
+  │ GET      │ /api/v1/modules/chart_of_accounts/items/export/   Export  │
+  │ POST     │ /api/v1/modules/chart_of_accounts/items/import/   Import  │
+  │ GET      │ /api/v1/modules/chart_of_accounts/template/       Template │
+  │ POST     │ /api/v1/modules/chart_of_accounts/wipe/           Wipe     │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  10. JOURNAL ENTRIES
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/journal_entries/stats/            Stats    │
+  │ GET      │ /api/v1/modules/journal_entries/next-number/      Next #  │
+  │ GET      │ /api/v1/modules/journal_entries/partners/         Partners│
+  │ GET      │ /api/v1/modules/journal_entries/template/         Template│
+  │ POST     │ /api/v1/modules/journal_entries/bulk-delete/      Bulk Del│
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  ITEMS (Journal Lines)
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/journal_entries/items/            List     │
+  │ POST     │ /api/v1/modules/journal_entries/items/create/     Create  │
+  │ GET      │ /api/v1/modules/journal_entries/items/<id>/       Detail  │
+  │ PUT      │ /api/v1/modules/journal_entries/items/<id>/update/ Upd   │
+  │ DELETE   │ /api/v1/modules/journal_entries/items/<id>/delete/ Del   │
+  │ POST     │ /api/v1/modules/journal_entries/items/<id>/post/   Post   │
+  │ POST     │ /api/v1/modules/journal_entries/items/<id>/unpost/ Unpost │
+  │ GET      │ /api/v1/modules/journal_entries/items/export/     Export  │
+  │ POST     │ /api/v1/modules/journal_entries/items/import/     Import  │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  JOURNALS (Groups)
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/journal_entries/journals/          List     │
+  │ POST     │ /api/v1/modules/journal_entries/journals/create/   Create  │
+  │ PUT      │ /api/v1/modules/journal_entries/journals/<id>/update/ Upd │
+  │ DELETE   │ /api/v1/modules/journal_entries/journals/<id>/delete/ Del │
+  │ POST     │ /api/v1/modules/journal_entries/journals/<id>/toggle/ Tgl │
+  │ GET      │ /api/v1/modules/journal_entries/journals/<id>/entries/ Ent│
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  JOURNAL TYPES
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/journal_entries/journal-types/    List     │
+  │ POST     │ /api/v1/modules/journal_entries/journal-types/create/ Cre │
+  │ PUT      │ /api/v1/modules/journal_entries/journal-types/<id>/update/│
+  │ DELETE   │ /api/v1/modules/journal_entries/journal-types/<id>/delete/│
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  ASSIGNMENTS
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/journal_entries/assignments/      List     │
+  │ GET      │ /api/v1/modules/journal_entries/assignments/mine/ Mine     │
+  │ POST     │ /api/v1/modules/journal_entries/assignments/user/<id>/ Set │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  11. BUDGETS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/budgets/stats/                   Stats    │
+  │ GET      │ /api/v1/modules/budgets/years/                   Years    │
+  │ GET      │ /api/v1/modules/budgets/comparison/              Compare  │
+  │ GET      │ /api/v1/modules/budgets/comparison/export/       Export   │
+  │ GET      │ /api/v1/modules/budgets/items/                   List     │
+  │ POST     │ /api/v1/modules/budgets/items/create/            Create   │
+  │ GET      │ /api/v1/modules/budgets/items/<id>/              Detail   │
+  │ PUT      │ /api/v1/modules/budgets/items/<id>/update/       Update   │
+  │ DELETE   │ /api/v1/modules/budgets/items/<id>/delete/       Delete   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  12. REGIONS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/regions/stats/                   Stats    │
+  │ GET      │ /api/v1/modules/regions/items/                   List     │
+  │ POST     │ /api/v1/modules/regions/items/create/            Create   │
+  │ GET      │ /api/v1/modules/regions/items/<id>/              Detail   │
+  │ PUT      │ /api/v1/modules/regions/items/<id>/update/       Update   │
+  │ DELETE   │ /api/v1/modules/regions/items/<id>/delete/       Delete   │
+  │ POST     │ /api/v1/modules/regions/items/<id>/activate/     Activate │
+  │ POST     │ /api/v1/modules/regions/items/<id>/deactivate/   Deactvte │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  13. ACCOUNTING REPORTS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/accounting_reports/stats/          Stats    │
+  │ GET      │ /api/v1/modules/accounting_reports/trial-balance/ Trial    │
+  │ GET      │ /api/v1/modules/accounting_reports/ledger/        Ledger   │
+  │          │   ?account_id=<id>  (required)                             │
+  │          │   &date_from=...  &date_to=...  &region_id=...             │
+  │ GET      │ /api/v1/modules/accounting_reports/income-statement/ IS    │
+  │ GET      │ /api/v1/modules/accounting_reports/balance-sheet/   BS    │
+  │ GET      │ /api/v1/modules/accounting_reports/cash-flow/       CF    │
+  │ GET      │ /api/v1/modules/accounting_reports/trial-balance/export/│
+  │ GET      │ /api/v1/modules/accounting_reports/ledger/export/       │
+  │ GET      │ /api/v1/modules/accounting_reports/income-statement/export/│
+  │ GET      │ /api/v1/modules/accounting_reports/balance-sheet/export/│
+  │ GET      │ /api/v1/modules/accounting_reports/cash-flow/export/    │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  Reports: trial-balance, ledger, income-statement, balance-sheet, cash-flow
+
+
+════════════════════════════════════════════════════════════════════════════════
+  14. ACCOUNTING REVIEWER
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/accounting_reviewer/stats/         Stats    │
+  │ GET      │ /api/v1/modules/accounting_reviewer/items/         List     │
+  │ POST     │ /api/v1/modules/accounting_reviewer/items/create/  Create  │
+  │ GET      │ /api/v1/modules/accounting_reviewer/items/<id>/    Detail  │
+  │ PUT      │ /api/v1/modules/accounting_reviewer/items/<id>/update/ Upd│
+  │ DELETE   │ /api/v1/modules/accounting_reviewer/items/<id>/delete/ Del│
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+  AUDIT
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/options/  Options│
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/settings/ Settings│
+  │ POST     │ /api/v1/modules/accounting_reviewer/audit/settings/update/ │
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/runs/     List   │
+  │ POST     │ /api/v1/modules/accounting_reviewer/audit/runs/create/ Cre│
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/runs/<id>/ Det  │
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/runs/<id>/findings/│
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/runs/<id>/report/ │
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/runs/<id>/report/excel/│
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/runs/<id>/report/print/│
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/runs/<id>/dashboard/│
+  │ POST     │ /api/v1/modules/accounting_reviewer/audit/runs/<id>/ask/   │
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/findings/<id>/   │
+  │ PUT      │ /api/v1/modules/accounting_reviewer/audit/findings/<id>/update/│
+  │ GET      │ /api/v1/modules/accounting_reviewer/audit/findings/<id>/tasks/│
+  │ POST     │ /api/v1/modules/accounting_reviewer/audit/findings/<id>/tasks/│
+  │ PUT      │ /api/v1/modules/accounting_reviewer/audit/tasks/<id>/update/│
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  15. FINANCIAL ANALYSIS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/financial_analysis/stats/          Stats    │
+  │ GET      │ /api/v1/modules/financial_analysis/items/          List     │
+  │ POST     │ /api/v1/modules/financial_analysis/items/create/   Create  │
+  │ GET      │ /api/v1/modules/financial_analysis/items/<id>/     Detail  │
+  │ PUT      │ /api/v1/modules/financial_analysis/items/<id>/update/ Upd │
+  │ DELETE   │ /api/v1/modules/financial_analysis/items/<id>/delete/ Del │
+  │ GET      │ /api/v1/modules/financial_analysis/options/        Options │
+  │ GET      │ /api/v1/modules/financial_analysis/settings/       Settings│
+  │ POST     │ /api/v1/modules/financial_analysis/settings/update/ Upd   │
+  │ GET      │ /api/v1/modules/financial_analysis/analyze/        Analyze │
+  │ POST     │ /api/v1/modules/financial_analysis/assistant/      AI      │
+  │ GET      │ /api/v1/modules/financial_analysis/export/         Export  │
+  │ GET      │ /api/v1/modules/financial_analysis/print/          Print   │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  16. REPORTS CENTER
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/modules/reports_center/options/           Options  │
+  │ GET      │ /api/v1/modules/reports_center/report/            Report   │
+  │ GET      │ /api/v1/modules/reports_center/report/export/     Export   │
+  │ GET      │ /api/v1/modules/reports_center/report/print/      Print    │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  17. SETTINGS & SYSTEM
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/settings/all                    All settings        │
+  │ GET      │ /api/v1/dashboard/stats           Dashboard stats            │
+  │ GET      │ /api/v1/settings/system                  System settings    │
+  │ PUT      │ /api/v1/settings/system/<id>             Update setting     │
+  │ GET      │ /api/v1/settings/lookups                Lookup values      │
+  │ GET      │ /api/v1/settings/lookups/<id>           Lookup detail      │
+  │ PUT      │ /api/v1/settings/lookups/<id>           Update lookup      │
+  │ DELETE   │ /api/v1/settings/lookups/<id>           Delete lookup      │
+  │ POST     │ /api/v1/settings/bulk-save              Bulk save          │
+  │ POST     │ /api/v1/settings/seed                   Seed defaults      │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+  Response shapes (measured — the web UI reads these exact keys):
+    GET /settings/system, /settings/all  -> {"settings": [...]}
+    GET /settings/lookups                -> {"lookups": [...]}
+    GET /settings/lookups/<id>           -> bare item object (no wrapper)
+    GET /dashboard/stats                 -> flat stats object (total_users, ...)
+    failed POST /settings/bulk-save      -> {"success": false, "error": "..."}
+
+
+════════════════════════════════════════════════════════════════════════════════
+  18. BACKUP
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/backup/list                   List backups         │
+  │ POST     │ /api/v1/backup/create                 Create backup       │
+  │ GET      │ /api/v1/backup/download/<filename>    Download backup     │
+  │ DELETE   │ /api/v1/backup/<filename>             Delete backup       │
+  │ POST     │ /api/v1/backup/restore                Restore backup      │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+  Response shape: GET /backup/list returns a bare JSON array (the
+  page reads .length on it directly).
+
+
+════════════════════════════════════════════════════════════════════════════════
+  19. AUDIT LOGS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/audit-logs                     Audit trail          │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  20. OPENAPI SCHEMA & DOCS
+════════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ GET      │ /api/v1/schema/                     Spectacular OpenAPI    │
+  │ GET      │ /api/v1/schema/openapi.json         Full resolver spec     │
+  │ GET      │ /api/v1/docs/                       Swagger UI             │
+  │ GET      │ /api/v1/redoc/                      ReDoc UI               │
+
+
+  Measured 2026-10-17 (resolver vs served documents):
+    * /schema/ (drf-spectacular) documents 4 of the 251 v1 routes -- only
+      the JWT token endpoints, mounted twice -- because the rest of this
+      API is plain Django function views that drf-spectacular cannot
+      introspect. OpenAPI 3.0.3, YAML (application/vnd.oai.openapi) by
+      default; JSON via Accept: application/vnd.oai.openapi+json or
+      ?format=json. The renderer formats are yaml|json; an unknown
+      ?format= value answers 404 with the error envelope (it answered
+      500 before 2026-10-17 -- fixed in drf_exception_handler).
+    * /schema/openapi.json is the COMPLETE spec: every registered v1
+      route, built from the same resolver walk that produces
+      docs/api/API_INVENTORY.md -- reference-proven methods, bearer or
+      session security per route, Django <int:id> converters as OpenAPI
+      path parameters. Regenerate the offline copy (docs/api/openapi.json)
+      with:  manage.py api_openapi
+    * The test suite pins all three together: resolver route set ==
+      served spec == command output, so the spec cannot drift.
+
+
+
+════════════════════════════════════════════════════════════════════════════════
+  21. EXAMPLE MODULE (Scaffold)
+════════════════════════════════════════════════════════════════════════════════
+
+  Starter CRUD template generated by ``manage.py startmodule``. It ships
+  with every deployment but is NOT part of the business API.
+
+  ┌──────────┬──────────────────────────────────────────────────────────────┐
+  │ Method   │ Endpoint                                                     │
+  ├──────────┼──────────────────────────────────────────────────────────────┤
+  │ GET      │ /api/v1/modules/example/items                 List           │
+  │ POST     │ /api/v1/modules/example/items/create         Create         │
+  │ GET      │ /api/v1/modules/example/items/<id>           Detail         │
+  │ PUT      │ /api/v1/modules/example/items/<id>/update    Update         │
+  │ DELETE   │ /api/v1/modules/example/items/<id>/delete    Delete         │
+  └──────────┴──────────────────────────────────────────────────────────────┘
+
+
+════════════════════════════════════════════════════════════════════════════════
+  NOTES
+════════════════════════════════════════════════════════════════════════════════
+
+  * All endpoints are available under BOTH /api/ and /api/v1/.
+    Use /api/v1/ for Flutter — it is versioned and stable.
+
+  * Response shapes — MEASURED (resolver AST + live web UI), 2026-10-15:
+    - Standard envelope: {"success": true, "message": "...",
+      "data": ..., "errors": null}                (api_response)
+    - Paginated lists:   data = {"items": [...], "meta": {...}}
+    - Every error:       {"success": false, "error": "..."}
+      (SINGULAR key "error" — "errors" exists only inside the
+      envelope above, where it is null unless the view fills it)
+    - Create/edit actions: {"success": true, "message": "...",
+      "<entity>": {...}}  (entity key at top level, no "data")
+    - JWT obtain: data = {"access", "refresh", "user": {id,
+      username}, "token_type": "Bearer"}; refresh rotates both
+      tokens — store the new refresh or treat failure as logout.
+    - Documented exceptions that are NOT envelopes — the web UI
+      reads them by key; do not re-wrap them client-side:
+        GET /users, /users/groups, /users/roles  -> bare JSON array
+        GET /backup/list                         -> bare JSON array
+        GET /users/permissions                   -> {permissions, groups}
+        GET /settings/lookups                    -> {lookups: [...]}
+        GET /settings/system, /settings/all      -> {settings: [...]}
+        GET /settings/lookups/<id>               -> bare item object
+        GET /dashboard/stats                     -> flat stats object
+        GET /auth/status                         -> {logged_in, user}
+      Section notes beside each table repeat the local shape.
+
+  * Authentication: JWT Bearer token in Authorization header.
+    Anonymous requests to protected endpoints return 401.
+
+  * Update endpoints accept both PUT and PATCH (PATCH behaves as PUT;
+    measured across every modules/*/items/<id>/update/ route).
+
+  * Rate limits:
+    - auth/token:  10 requests/minute (shared with auth/login)
+    - sync:        300 requests/minute
+    - other APIs:  60 requests/minute
+
+  * The ledger endpoint requires account_id (integer PK), not account code.
+
+  * Sync pull returns up to 500 rows per model per page.
+    Use ?page=2 to get the next page.
+
+  * CORS is enabled for cross-origin requests.
+
+  * The production server is on Render free tier and may sleep.
+    First request after idle takes ~30-60 seconds to wake up.
+
+════════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,73 @@
+# TimeTrack Enterprise - Docker Compose stack.
+#
+# Usage (from this folder):
+#   cp .env.example .env          # then edit the secrets/hosts
+#   docker compose up -d --build
+#   docker compose logs -f web
+#
+# The Django container is never published directly; Nginx terminates TLS and
+# proxies to it over the internal network.
+
+name: timetrack-enterprise
+
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    image: timetrack-enterprise:latest
+    restart: unless-stopped
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      ATTENDANCE_DATA_DIR: /app/data
+      ATTENDANCE_ALLOWED_HOSTS: ${ATTENDANCE_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      ATTENDANCE_CSRF_TRUSTED_ORIGINS: ${ATTENDANCE_CSRF_TRUSTED_ORIGINS:-}
+      ATTENDANCE_SECRET_KEY: ${ATTENDANCE_SECRET_KEY:?set ATTENDANCE_SECRET_KEY in .env}
+      # Nginx performs the HTTP -> HTTPS redirect and sets X-Forwarded-Proto.
+      ATTENDANCE_SSL_REDIRECT: "0"
+      ATTENDANCE_BACKGROUND_JOBS: ${ATTENDANCE_BACKGROUND_JOBS:-1}
+      ATTENDANCE_THREADS: ${ATTENDANCE_THREADS:-8}
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+      GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
+      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
+    volumes:
+      - attendance_data:/app/data
+      - static_files:/app/staticfiles
+    expose:
+      - "8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/', timeout=5)"
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ../nginx/timetrack.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../nginx/certs:/etc/nginx/certs:ro
+      - static_files:/srv/static:ro
+    networks:
+      - internal
+
+volumes:
+  attendance_data:
+  static_files:
+
+networks:
+  internal:
+    driver: bridge

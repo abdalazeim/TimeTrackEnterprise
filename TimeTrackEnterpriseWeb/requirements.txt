@@ -1,5 +1,15 @@
-Flask==3.1.3
+# Web framework and templating
+Django==5.2.7
+Jinja2==3.1.6
+
+# WSGI servers: waitress for the desktop build, gunicorn for Linux/Docker
 waitress==3.0.2
+gunicorn==23.0.0
+
+# Legacy password hashes (Werkzeug PBKDF2) kept for backward compatibility
+Werkzeug==3.1.3
+
+# Import/export, barcodes, QR codes, HTTP client and signing
 openpyxl==3.1.5
 xlrd==2.0.2
 beautifulsoup4==4.15.0

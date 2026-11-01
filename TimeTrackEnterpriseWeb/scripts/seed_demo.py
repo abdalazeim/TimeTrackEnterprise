@@ -9,6 +9,7 @@ The script wipes the target data directory only when --force is provided.
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sqlite3
 import struct
@@ -20,8 +21,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from attendance_app import create_app  # noqa: E402
-from attendance_app.db import save_settings  # noqa: E402
+
+def _bootstrap(data_dir: Path) -> None:
+    """Point Django at ``data_dir`` before importing settings/models."""
+    os.environ["ATTENDANCE_DATA_DIR"] = str(data_dir)
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+    os.environ["ATTENDANCE_DISABLE_SCHEDULER"] = "1"
+
+    import django
+
+    django.setup()
 
 
 def _png(width: int, height: int, pixel) -> bytes:
@@ -80,13 +89,21 @@ def seed(data_dir: Path, force: bool) -> None:
             )
         shutil.rmtree(data_dir)
 
-    app = create_app({"DATA_DIR": str(data_dir), "SCHEDULER_INTERVAL": 86400})
-    db_path = Path(app.config["DB_PATH"])
+    _bootstrap(data_dir)
+
+    from django.conf import settings
+
+    from apps.core.db import ensure_database, save_settings
+
+    ensure_database()
+    db_path = Path(settings.DB_PATH)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
 
-    logo_path = Path(app.config["UPLOADS_DIR"]) / "logo_demo.png"
+    uploads_dir = Path(settings.UPLOADS_DIR)
+    uploads_dir.mkdir(parents=True, exist_ok=True)
+    logo_path = uploads_dir / "logo_demo.png"
     logo_path.write_bytes(_png(240, 240, _logo_pixel))
 
     school = "متوسطة الأمير عبد القادر"

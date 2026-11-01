@@ -1,3 +1,12 @@
 -r requirements.txt
+
+# Test tooling (Django test runner + pytest integration)
 pytest==9.1.1
+pytest-django==4.11.1
+pytest-cov==7.0.0
+
+# Desktop packaging and installer
 pyinstaller==6.22.3
+
+# Static analysis / formatting (optional, see docs/TESTING.md)
+ruff==0.14.3

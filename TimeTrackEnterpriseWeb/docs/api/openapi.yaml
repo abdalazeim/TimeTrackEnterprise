@@ -1,0 +1,486 @@
+openapi: 3.1.0
+info:
+  title: TimeTrack Enterprise API
+  version: "1.0"
+  description: |
+    JSON API for the attendance system. Legacy routes keep the Flask form
+    without a trailing slash; native routes (`/api/sync/`, `/api/accounts/`,
+    `/api/core/`) use one. Every response carries `ok`; errors use
+    `{"ok": false, "error": {"code": "...", "message": "..."}}`.
+
+    Session mutations must send `X-Requested-With: StudentAttendance`.
+    Device endpoints use `X-Device-Token`.
+servers:
+  - url: http://127.0.0.1:8765
+    description: Desktop launcher
+  - url: https://attendance.example.org
+    description: Production
+tags:
+  - name: health
+  - name: students
+  - name: attendance
+  - name: slips
+  - name: reports
+  - name: sync
+security:
+  - sessionCookie: []
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    deviceToken:
+      type: apiKey
+      in: header
+      name: X-Device-Token
+    requestGuard:
+      type: apiKey
+      in: header
+      name: X-Requested-With
+  parameters:
+    CsrfHeader:
+      name: X-Requested-With
+      in: header
+      required: true
+      schema:
+        const: StudentAttendance
+    DeviceToken:
+      name: X-Device-Token
+      in: header
+      required: true
+      schema:
+        type: string
+  schemas:
+    Ok:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          const: true
+    Error:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              examples: [auth_required, forbidden, csrf, validation, not_found]
+            message:
+              type: string
+    Student:
+      type: object
+      required: [student_nin, first_name, last_name]
+      properties:
+        student_nin:
+          type: string
+          pattern: "^[0-9A-Za-z_-]{4,32}$"
+        first_name:
+          type: string
+        last_name:
+          type: string
+        birth_date:
+          type: [string, "null"]
+          format: date
+        class_group:
+          type: string
+        parent_phone:
+          type: string
+        photo_url:
+          type: [string, "null"]
+        is_active:
+          type: boolean
+    ScanRequest:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          description: Student NIN, QR payload or slip code.
+        period_id:
+          type: integer
+    SyncChange:
+      type: object
+      required: [entity, entity_key, operation, payload]
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        entity:
+          type: string
+          enum: [student, period, attendance, entry_slip, exit_slip, settings, message_campaign]
+        entity_key:
+          type: string
+          maxLength: 128
+        operation:
+          type: string
+          enum: [create, update, delete]
+        base_revision:
+          type: integer
+          minimum: 0
+        updated_at:
+          type: string
+          format: date-time
+        payload:
+          type: object
+          additionalProperties: true
+paths:
+  /api/health:
+    get:
+      tags: [health]
+      security: []
+      summary: Legacy health probe
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      app: {type: string, examples: [StudentAttendance]}
+  /api/core/health/:
+    get:
+      tags: [health]
+      security: []
+      summary: Django-native health probe
+      responses:
+        "200":
+          description: Healthy
+  /api/accounts/me/:
+    get:
+      tags: [health]
+      summary: Current session identity
+      responses:
+        "200":
+          description: Session user
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/students:
+    get:
+      tags: [students]
+      summary: Search and list students
+      parameters:
+        - {name: q, in: query, schema: {type: string}}
+        - {name: class_group, in: query, schema: {type: string}}
+        - {name: active, in: query, schema: {type: string, enum: ["0", "1"]}}
+      responses:
+        "200":
+          description: Paginated list with counters
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Ok"
+                  - type: object
+                    properties:
+                      total: {type: integer}
+                      items:
+                        type: array
+                        items: {$ref: "#/components/schemas/Student"}
+                      counts:
+                        type: object
+                        properties:
+                          all: {type: integer}
+                          active: {type: integer}
+                          inactive: {type: integer}
+    post:
+      tags: [students]
+      summary: Create a student
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Student"}
+      responses:
+        "200":
+          description: Created
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /api/students/{nin}:
+    parameters:
+      - {name: nin, in: path, required: true, schema: {type: string}}
+    get:
+      tags: [students]
+      summary: Read one student
+      responses:
+        "200":
+          description: Student
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [students]
+      summary: Update a student
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Student"}
+      responses:
+        "200":
+          description: Updated
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/gate/scan:
+    post:
+      tags: [attendance]
+      summary: Record a gate scan
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ScanRequest"}
+      responses:
+        "200":
+          description: Scan result (`action`: present, late, duplicate, ...)
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /api/attendance/list:
+    get:
+      tags: [attendance]
+      summary: Daily attendance log
+      parameters:
+        - {name: date, in: query, schema: {type: string, format: date}}
+        - {name: period_id, in: query, schema: {type: integer}}
+      responses:
+        "200":
+          description: Log entries
+  /api/attendance/close:
+    post:
+      tags: [attendance]
+      summary: Close a period (idempotent)
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      responses:
+        "200":
+          description: Close summary (`inserted`, `already_closed`)
+  /api/entry-slip:
+    post:
+      tags: [slips]
+      summary: Issue an entry slip
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      responses:
+        "200":
+          description: Slip + `already_issued` flag
+  /api/exit-slip:
+    post:
+      tags: [slips]
+      summary: Issue an exit slip
+      parameters:
+        - $ref: "#/components/parameters/CsrfHeader"
+      responses:
+        "200":
+          description: Slip
+  /api/reports/daily:
+    get:
+      tags: [reports]
+      summary: Daily report (JSON)
+      parameters:
+        - {name: date, in: query, schema: {type: string, format: date}}
+        - {name: period_id, in: query, schema: {type: integer}}
+      responses:
+        "200":
+          description: Report payload
+  /api/reports/daily.xlsx:
+    get:
+      tags: [reports]
+      summary: Daily report (XLSX)
+      responses:
+        "200":
+          description: Workbook
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema: {type: string, format: binary}
+  /api/sync/capabilities/:
+    get:
+      tags: [sync]
+      security: []
+      summary: Discover the sync protocol
+      responses:
+        "200":
+          description: Version, entities and features
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: {type: boolean}
+                  version: {type: integer, const: 1}
+                  entities: {type: array, items: {type: string}}
+                  operations: {type: array, items: {type: string}}
+                  features: {type: array, items: {type: string}}
+                  server_time: {type: string, format: date-time}
+  /api/sync/devices/:
+    get:
+      tags: [sync]
+      summary: List paired devices
+      responses:
+        "200":
+          description: Devices
+    post:
+      tags: [sync]
+      summary: Register a device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: {type: string, maxLength: 120}
+                platform: {type: string, enum: [desktop, android, ios, web, other]}
+                app_version: {type: string}
+      responses:
+        "201":
+          description: Device with a one-time visible token
+  /api/sync/push/:
+    post:
+      tags: [sync]
+      security:
+        - deviceToken: []
+      summary: Push an idempotent batch of changes
+      parameters:
+        - $ref: "#/components/parameters/DeviceToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [changes]
+              properties:
+                changes:
+                  type: array
+                  maxItems: 1000
+                  items: {$ref: "#/components/schemas/SyncChange"}
+      responses:
+        "200":
+          description: Batch result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: {type: boolean}
+                  applied: {type: integer}
+                  duplicates: {type: integer}
+                  conflicts: {type: integer}
+                  rejected: {type: integer}
+                  results: {type: array, items: {type: object}}
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/sync/pull/:
+    get:
+      tags: [sync]
+      security:
+        - deviceToken: []
+      summary: Pull changes made by other devices
+      parameters:
+        - $ref: "#/components/parameters/DeviceToken"
+        - {name: since, in: query, schema: {type: string, format: date-time}}
+        - {name: entity, in: query, schema: {type: string}}
+        - {name: limit, in: query, schema: {type: integer, default: 500, maximum: 2000}}
+      responses:
+        "200":
+          description: Changes and the cursor to use for the next pull
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: {type: boolean}
+                  changes:
+                    type: array
+                    items: {$ref: "#/components/schemas/SyncChange"}
+                  count: {type: integer}
+                  server_time: {type: string, format: date-time}
+                  next_since:
+                    type: string
+                    format: date-time
+                    description: >-
+                      Pass back as ``since``. Microsecond precision, so no
+                      change is skipped between two pulls.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/sync/conflicts/:
+    get:
+      tags: [sync]
+      summary: Review conflicts
+      parameters:
+        - {name: all, in: query, schema: {type: string, enum: ["1"]}}
+      responses:
+        "200":
+          description: Conflicts
+  /api/sync/conflicts/{id}/resolve/:
+    post:
+      tags: [sync]
+      summary: Resolve a conflict
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [strategy]
+              properties:
+                strategy: {type: string, enum: [local, server, merged]}
+                payload: {type: object}
+      responses:
+        "200":
+          description: Resolved record
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /health/:
+    get:
+      tags: [health]
+      security: []
+      summary: Launcher and proxy liveness probe
+      responses:
+        "200":
+          description: Healthy
+responses:
+  BadRequest:
+    description: Invalid payload
+    content:
+      application/json:
+        schema: {$ref: "#/components/schemas/Error"}
+  Unauthorized:
+    description: Login or device token required
+    content:
+      application/json:
+        schema: {$ref: "#/components/schemas/Error"}
+  Forbidden:
+    description: Administrator rights required
+    content:
+      application/json:
+        schema: {$ref: "#/components/schemas/Error"}
+  NotFound:
+    description: Unknown resource
+    content:
+      application/json:
+        schema: {$ref: "#/components/schemas/Error"}
+  Conflict:
+    description: Duplicate or stale revision
+    content:
+      application/json:
+        schema: {$ref: "#/components/schemas/Error"}

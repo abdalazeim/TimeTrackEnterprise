@@ -462,7 +462,9 @@ def _config_from_settings() -> dict[str, Any]:
     data_dir = Path(getattr(settings, "DATA_DIR", Path(settings.BASE_DIR) / "data"))
     db_path = getattr(settings, "DB_PATH", None)
     if not db_path:
-        db_path = settings.DATABASES["default"].get("NAME") or str(data_dir / "attendance.db")
+        db_path = settings.DATABASES["default"].get("NAME") or str(
+            data_dir / "TimeTrackEnterprise.db"
+        )
     return {
         "DATA_DIR": str(data_dir),
         "DB_PATH": str(db_path),

@@ -103,5 +103,5 @@ A minimal pipeline is:
 4. `node --test tests/e2e/test_camera_scan.cjs`
 5. `python -m ruff check .`
 
-Never run the production settings against the real `data/attendance.db` in a
+Never run the production settings against the real `data/TimeTrackEnterprise.db` in a
 test: always use `config.settings.test` (or a copy of the database).

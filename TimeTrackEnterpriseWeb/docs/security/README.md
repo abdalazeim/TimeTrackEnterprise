@@ -6,7 +6,7 @@ the threat model is closer to a records system than to a public website:
 
 | Asset | Where it lives |
 | --- | --- |
-| Student records, attendance, phone numbers | `data/attendance.db` |
+| Student records, attendance, phone numbers | `data/TimeTrackEnterprise.db` |
 | Student photos, school logo, stamp | `data/photos`, `data/uploads` |
 | Session keys, update signing key | `data/.secret_key`, `secrets/` (never deployed) |
 | Paired Android devices | `sync_devices` table + tokens |

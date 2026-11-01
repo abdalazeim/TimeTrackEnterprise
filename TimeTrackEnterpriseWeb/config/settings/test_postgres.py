@@ -37,7 +37,10 @@ DATABASES = {
 }
 
 # The legacy compatibility layer still reads/writes a SQLite file.
-DB_PATH = Path(os.environ.get("ATTENDANCE_DB_PATH") or (BASE_DIR / "data" / "attendance.db"))
+DB_PATH = Path(
+    os.environ.get("ATTENDANCE_DB_PATH")
+    or (BASE_DIR / "data" / "TimeTrackEnterprise.db")
+)
 
 # Postgres is only used for structural verification in CI.
 TESTING = True

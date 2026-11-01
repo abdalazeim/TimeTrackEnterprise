@@ -2,7 +2,7 @@
 
 Usage::
 
-    python scripts/restore.py backups/attendance-20261031-120000.db
+    python scripts/restore.py backups/TimeTrackEnterprise-20261031-120000.db
     python scripts/restore.py backup.db --data-dir D:\\school-data --force
 
 The current database is copied to ``backups/pre-restore-<timestamp>.db``
@@ -12,11 +12,21 @@ SQLite does not allow replacing a file while it is open on Windows.
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from apps.core.database_file import (  # noqa: E402
+    default_database_path,
+    migrate_legacy_database,
+)
 
 
 def project_root() -> Path:
@@ -26,7 +36,7 @@ def project_root() -> Path:
 def data_dir(override: str | None) -> Path:
     if override:
         return Path(override).resolve()
-    return Path(__import__("os").environ.get("ATTENDANCE_DATA_DIR") or (project_root() / "data"))
+    return Path(os.environ.get("ATTENDANCE_DATA_DIR") or (project_root() / "data"))
 
 
 def validate(path: Path) -> None:
@@ -42,7 +52,7 @@ def validate(path: Path) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Restore an attendance database")
+    parser = argparse.ArgumentParser(description="Restore a TimeTrackEnterprise database")
     parser.add_argument("backup", help="Path to the .db backup")
     parser.add_argument("--data-dir", default=None)
     parser.add_argument("--force", action="store_true", help="Replace without asking")
@@ -52,8 +62,9 @@ def main(argv: list[str] | None = None) -> int:
     validate(source)
 
     target_dir = data_dir(args.data_dir)
-    target = target_dir / "attendance.db"
+    target = default_database_path(target_dir, os.environ.get("ATTENDANCE_DB_PATH"))
     target_dir.mkdir(parents=True, exist_ok=True)
+    migrate_legacy_database(target)
 
     if target.exists():
         if not args.force:
@@ -70,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
 
     shutil.copy2(source, target)
     for suffix in ("-wal", "-shm"):
-        (target_dir / f"attendance.db{suffix}").unlink(missing_ok=True)
+        target.with_name(target.name + suffix).unlink(missing_ok=True)
     print(f"Restored {source} -> {target}")
     return 0
 

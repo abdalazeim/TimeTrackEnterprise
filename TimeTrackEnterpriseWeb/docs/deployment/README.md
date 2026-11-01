@@ -20,7 +20,7 @@ folder differ.
 | --- | --- | --- |
 | `DJANGO_SETTINGS_MODULE` | `config.settings.development` | settings module |
 | `ATTENDANCE_DATA_DIR` | `data/` next to the project | database, photos, uploads, logs, updates |
-| `ATTENDANCE_DB_PATH` | `DATA_DIR/attendance.db` | explicit database file |
+| `ATTENDANCE_DB_PATH` | `DATA_DIR/TimeTrackEnterprise.db` | explicit database file |
 | `ATTENDANCE_SECRET_KEY` | generated in `DATA_DIR/.secret_key` | sessions and signing (required in Docker) |
 | `ATTENDANCE_ALLOWED_HOSTS` | `localhost,127.0.0.1` | comma-separated host names |
 | `ATTENDANCE_CSRF_TRUSTED_ORIGINS` | empty | comma-separated `https://…` origins |
@@ -91,7 +91,7 @@ morning period. Log in immediately and set a password from **الإعدادات 
 
 | Volume | Container path | Content |
 | --- | --- | --- |
-| `attendance_data` | `/app/data` | `attendance.db`, photos, uploads, logs, update staging |
+| `attendance_data` | `/app/data` | `TimeTrackEnterprise.db`, photos, uploads, logs, update staging |
 | `static_files` | `/app/staticfiles` → `/srv/static` | collected static assets |
 
 Back them up together: the database references photo filenames, and the
@@ -113,7 +113,9 @@ docker compose up -d
 ```
 
 Migrations run automatically. Keep the previous image tag so you can roll
-back; restore `attendance.db` together with the matching image if a schema
+back; the previous `attendance.db` remains available while the new
+`TimeTrackEnterprise.db` is used by the renamed application. Restore the database
+together with the matching image if a schema
 change ever needs to be undone.
 
 ## systemd (Linux without Docker)

@@ -1,8 +1,10 @@
 # Database
 
-The application uses **SQLite** at `DB_PATH` (`DATA_DIR/attendance.db` by
-default). Django and the migrated functional layer share the same file, so a
-backup is a single file copy.
+The application uses **SQLite** at `DB_PATH` (`DATA_DIR/TimeTrackEnterprise.db`
+by default). Django and the migrated functional layer share the same file, so
+a backup is a single file copy. On first startup, an existing
+`DATA_DIR/attendance.db` is copied to the new name with SQLite's online backup
+API; the old file is retained as a recovery copy.
 
 ## Layout
 
@@ -88,7 +90,7 @@ and only inserts the administrator/periods when the tables are empty.
 * UI: **الإعدادات → نسخة احتياطية** or `GET /api/system/backup` (admin) →
   gzipped copy via `apps/core/services/backup.py`.
 * CLI: `python scripts/backup.py` writes to `backups/`.
-* Restore: stop the application, replace `data/attendance.db` with the backup
+* Restore: stop the application, replace `data/TimeTrackEnterprise.db` with the backup
   (decompress if `.gz`), start again. Keep `data/photos`, `data/uploads` and
   `data/updates` next to the database.
 * The sync tables are part of the same file; a restore also restores device

@@ -23,7 +23,7 @@ for _sub in ("photos", "uploads", "tmp", "logs", "updates", "media", "backups"):
     (_DATA_ROOT / _sub).mkdir(parents=True, exist_ok=True)
 
 DATA_DIR = _DATA_ROOT
-DB_PATH = _DATA_ROOT / "attendance.db"
+DB_PATH = _DATA_ROOT / "TimeTrackEnterprise.db"
 PHOTOS_DIR = _DATA_ROOT / "photos"
 UPLOADS_DIR = _DATA_ROOT / "uploads"
 TMP_DIR = _DATA_ROOT / "tmp"

@@ -11,6 +11,7 @@ import secrets
 from pathlib import Path
 
 from apps.core import config as legacy_config
+from apps.core.database_file import default_database_path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -22,7 +23,7 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 for _sub in ("photos", "uploads", "tmp", "logs", "updates", "media", "backups"):
     (DATA_DIR / _sub).mkdir(parents=True, exist_ok=True)
 
-DB_PATH = Path(os.environ.get("ATTENDANCE_DB_PATH") or (DATA_DIR / "attendance.db"))
+DB_PATH = default_database_path(DATA_DIR, os.environ.get("ATTENDANCE_DB_PATH"))
 PHOTOS_DIR = DATA_DIR / "photos"
 UPLOADS_DIR = DATA_DIR / "uploads"
 TMP_DIR = DATA_DIR / "tmp"

@@ -59,6 +59,10 @@ class CoreConfig(AppConfig):
         """
         if not self._sqlite_backend():
             return
+        if not getattr(settings, "TESTING", False):
+            from apps.core.database_file import migrate_legacy_database
+
+            migrate_legacy_database(settings.DB_PATH)
         try:
             from apps.core.db import ensure_database
 

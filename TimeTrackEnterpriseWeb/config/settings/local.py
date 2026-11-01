@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 
 from .development import *  # noqa: F401,F403
+from apps.core.database_file import default_database_path
 
 DEBUG = os.environ.get("ATTENDANCE_DEBUG", "1") == "1"
 ALLOWED_HOSTS = ["*"]
@@ -16,7 +17,7 @@ ALLOWED_HOSTS = ["*"]
 # Optional: point the whole runtime data folder somewhere else.
 if os.environ.get("ATTENDANCE_DATA_DIR"):
     DATA_DIR = __import__("pathlib").Path(os.environ["ATTENDANCE_DATA_DIR"]).resolve()
-    DB_PATH = DATA_DIR / "attendance.db"
+    DB_PATH = default_database_path(DATA_DIR, os.environ.get("ATTENDANCE_DB_PATH"))
     PHOTOS_DIR = DATA_DIR / "photos"
     UPLOADS_DIR = DATA_DIR / "uploads"
     TMP_DIR = DATA_DIR / "tmp"

@@ -21,7 +21,7 @@ compatibility layer so the migration could be verified function by function.
 └───────────────┬──────────────────────────────────────────────────────┘
                 │
 ┌───────────────▼──────────────────────────────────────────────────────┐
-│ SQLite (DATA_DIR/attendance.db)                                      │
+│ SQLite (DATA_DIR/TimeTrackEnterprise.db)                              │
 │   legacy tables (users, students, periods, logs, slips, messages…)   │
 │   Django tables (sessions, admin, sync_records, sync_conflicts…)     │
 └──────────────────────────────────────────────────────────────────────┘

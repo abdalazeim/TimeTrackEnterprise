@@ -91,7 +91,7 @@ py -3 -m venv .venv
 
 ```text
 data\
-├── attendance.db      قاعدة البيانات (Django + الجداول القديمة)
+├── TimeTrackEnterprise.db  قاعدة البيانات (Django + الجداول القديمة)
 ├── photos\            صور التلاميذ
 ├── uploads\           الشعار والطابع
 ├── logs\app.log       سجل دوّار
@@ -114,10 +114,10 @@ data\
 - الاستعادة: أوقف التطبيق ثم:
 
 ```bat
-.venv\Scripts\python.exe scripts\restore.py backups\attendance-20261031-120000.db
+.venv\Scripts\python.exe scripts\restore.py backups\TimeTrackEnterprise-20261031-120000.db
 ```
 
-أو استبدل `attendance.db` يدويًا واحذف `attendance.db-wal` و`attendance.db-shm`. لا تفتح قاعدة البيانات بأدوات خارجية أثناء التشغيل.
+اسم ملف قاعدة البيانات هو `TimeTrackEnterprise.db`. عند أول تشغيل، ينسخ النظام قاعدة `attendance.db` القديمة بأمان إلى الاسم الجديد ويحتفظ بالأصل كنسخة رجوع. لا تفتح قاعدة البيانات بأدوات خارجية أثناء التشغيل.
 
 ## الاستيراد الذكي
 

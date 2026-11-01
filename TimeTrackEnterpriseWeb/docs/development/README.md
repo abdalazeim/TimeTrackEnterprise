@@ -43,7 +43,7 @@ Select one with `DJANGO_SETTINGS_MODULE` or
 | --- | --- | --- |
 | `DJANGO_SETTINGS_MODULE` | `config.settings.development` | settings module |
 | `ATTENDANCE_DATA_DIR` | `<project>/data` | database, photos, uploads, logs, updates |
-| `ATTENDANCE_DB_PATH` | `DATA_DIR/attendance.db` | explicit database file |
+| `ATTENDANCE_DB_PATH` | `DATA_DIR/TimeTrackEnterprise.db` | explicit database file |
 | `ATTENDANCE_SECRET_KEY` | generated into `DATA_DIR/.secret_key` | signing/session key |
 | `ATTENDANCE_ALLOWED_HOSTS` | `localhost,127.0.0.1` | production hosts |
 | `ATTENDANCE_CSRF_TRUSTED_ORIGINS` | empty | comma-separated origins |

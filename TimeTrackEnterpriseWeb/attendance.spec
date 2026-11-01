@@ -47,7 +47,7 @@ hiddenimports = [
     "django.contrib.staticfiles",
     "django.db.backends.sqlite3",
     "django.core.management.commands.migrate",
-    "django.core.management.commands.collectstatic",
+    "django.contrib.staticfiles.management.commands.collectstatic",
     "django.template.backends.django",
     "django.template.backends.jinja2",
     # Project modules (settings, URLconf, WSGI, template environment).

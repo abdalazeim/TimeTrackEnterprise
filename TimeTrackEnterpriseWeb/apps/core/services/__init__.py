@@ -1,1 +1,1 @@
-Core services package.
+"""Core services package."""

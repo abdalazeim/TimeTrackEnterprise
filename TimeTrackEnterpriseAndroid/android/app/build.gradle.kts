@@ -16,11 +16,13 @@ val hasReleaseSigning = listOf(
     releaseKeyPassword,
 ).all { !it.isNullOrBlank() }
 
+val configuredAppName = System.getenv("APP_NAME")
+    ?.takeIf { it.isNotBlank() }
+    ?: "TimeTrackEnterprise"
+val templateAppName = configuredAppName
+
 android {
     namespace = "com.timetrack.enterprise"
-    val configuredAppName = System.getenv("APP_NAME")
-        ?.takeIf { it.isNotBlank() }
-        ?: "TimeTrackEnterprise"
     compileSdk = flutter.compileSdkVersion
     // لا توجد إضافات أصلية مكتوبة بـC/C++ في هذا المشروع، لذا لا حاجة إلى NDK.
     // حذف السطر يمنع Gradle من محاولة تنزيل نسخة NDK غير مثبتة.
@@ -28,6 +30,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -65,6 +68,20 @@ android {
                 signingConfigs.getByName("debug")
             }
         }
+        debug {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    dependencies {
+        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
+    }
+
+    applicationVariants.configureEach {
+        outputs.configureEach {
+            (this as com.android.build.gradle.internal.api.ApkVariantOutputImpl).outputFileName =
+                "${templateAppName}-${name}.apk"
+        }
     }
 }
 
@@ -96,9 +113,6 @@ kotlin {
 
 // ينسخ حزمة الإصدار تلقائيًا إلى مجلد dist باسم القالب.
 // حتى يظهر الملف للعميل بالاسم الصحيح بعد كل عملية بناء.
-val templateAppName = System.getenv("APP_NAME")
-    ?.takeIf { it.isNotBlank() }
-    ?: "TimeTrackEnterprise"
 val templateApkName = "$templateAppName.apk"
 
 tasks.register("publishTemplateApk") {

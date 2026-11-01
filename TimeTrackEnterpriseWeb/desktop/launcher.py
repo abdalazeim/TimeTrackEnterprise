@@ -12,7 +12,7 @@ Starts the packaged desktop server.  It:
 Usage::
 
     python desktop/launcher.py --host 127.0.0.1 --port 8765
-    SmartAttendance.exe --data-dir D:\\school-data --no-browser
+    TimeTrackEnterprise.exe --data-dir D:\\school-data --no-browser
 """
 from __future__ import annotations
 

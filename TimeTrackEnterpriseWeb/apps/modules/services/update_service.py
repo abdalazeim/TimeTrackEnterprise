@@ -160,7 +160,7 @@ def _safe_filename(asset: dict, version: str) -> str:
     original = Path(urlsplit(asset["url"]).path).name
     stem = re.sub(r"[^A-Za-z0-9._-]+", "_", original or "").strip("._")
     if not stem.lower().endswith(".exe"):
-        stem = f"SmartAttendance_{version}.exe"
+        stem = f"TimeTrackEnterprise_{version}.exe"
     return f"update_{version}_{asset['kind']}_{stem}"
 
 

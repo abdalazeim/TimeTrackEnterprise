@@ -12,9 +12,11 @@ OUTPUT = ROOT / "build_assets" / "attendance.ico"
 SIZES = (16, 24, 32, 48, 64, 128, 256)
 MASTER = 1024
 
-GREEN_TOP = (22, 160, 133)
-GREEN_BOTTOM = (9, 92, 73)
-WHITE = (255, 255, 255, 255)
+NAVY_TOP = (16, 36, 64)
+TEAL_BOTTOM = (7, 111, 110)
+CLOCK_FACE = (247, 253, 255, 255)
+BADGE_FILL = (184, 245, 224, 255)
+BADGE_CHECK = (8, 59, 70, 255)
 
 
 def _rounded_rect(x: float, y: float, left: float, top: float, right: float, bottom: float, radius: float) -> bool:
@@ -33,33 +35,21 @@ def _segment_distance(px: float, py: float, ax: float, ay: float, bx: float, by:
 
 
 def _master_pixels() -> list[tuple[int, int, int, int]]:
-    bars = [26, 12, 18, 34, 12, 26, 12, 34, 18, 12, 26]
-    gap = 18
-    total = sum(bars) + gap * (len(bars) - 1)
-    area_left, area_right = 236, 788
-    area_top, area_bottom = 246, 560
-    scale = (area_right - area_left) / total
-    rects: list[tuple[float, float, float, float]] = []
-    cursor = area_left
-    for width in bars:
-        bar_width = width * scale
-        rects.append((cursor, area_top, cursor + bar_width, area_bottom))
-        cursor += bar_width + gap * scale
-
-    circle_x, circle_y, circle_r = 700.0, 724.0, 176.0
-    check = ((628.0, 728.0), (684.0, 784.0), (790.0, 668.0))
-    stroke = 58.0
-
+    clock_x, clock_y, clock_r = 448.0, 432.0, 270.0
+    badge_x, badge_y, badge_r = 722.0, 722.0, 156.0
+    minute_hand = (625.0, 270.0)
+    hour_hand = (288.0, 270.0)
+    check = ((654.0, 722.0), (700.0, 768.0), (792.0, 664.0))
     pixels: list[tuple[int, int, int, int]] = []
-    margin = 30.0
-    radius = 218.0
+    margin = 26.0
+    radius = 226.0
     for y in range(MASTER):
         py = y + 0.5
-        ratio = y / (MASTER - 1)
+        ratio = (x_ratio := y / (MASTER - 1))
         background = (
-            round(GREEN_TOP[0] + (GREEN_BOTTOM[0] - GREEN_TOP[0]) * ratio),
-            round(GREEN_TOP[1] + (GREEN_BOTTOM[1] - GREEN_TOP[1]) * ratio),
-            round(GREEN_TOP[2] + (GREEN_BOTTOM[2] - GREEN_TOP[2]) * ratio),
+            round(NAVY_TOP[0] + (TEAL_BOTTOM[0] - NAVY_TOP[0]) * ratio),
+            round(NAVY_TOP[1] + (TEAL_BOTTOM[1] - NAVY_TOP[1]) * ratio),
+            round(NAVY_TOP[2] + (TEAL_BOTTOM[2] - NAVY_TOP[2]) * ratio),
             255,
         )
         for x in range(MASTER):
@@ -67,19 +57,35 @@ def _master_pixels() -> list[tuple[int, int, int, int]]:
             if not _rounded_rect(px, py, margin, margin, MASTER - margin, MASTER - margin, radius):
                 pixels.append((0, 0, 0, 0))
                 continue
-            px_out = px - circle_x
-            py_out = py - circle_y
-            on_check = any(
-                _segment_distance(px, py, check[i][0], check[i][1], check[i + 1][0], check[i + 1][1]) <= stroke / 2
-                for i in range(len(check) - 1)
-            )
-            if px_out * px_out + py_out * py_out <= circle_r * circle_r:
-                pixels.append(background[:3] + (255,) if on_check else WHITE)
-                continue
-            if any(left <= px <= right and top <= py <= bottom for left, top, right, bottom in rects):
-                pixels.append(WHITE)
-                continue
-            pixels.append(background)
+            color = background
+            clock_dx, clock_dy = px - clock_x, py - clock_y
+            clock_distance = math.hypot(clock_dx, clock_dy)
+            badge_dx, badge_dy = px - badge_x, py - badge_y
+            badge_distance = math.hypot(badge_dx, badge_dy)
+
+            if abs(clock_distance - clock_r) <= 24:
+                color = CLOCK_FACE
+            elif any(
+                _segment_distance(px, py, *start, *end) <= width / 2
+                for start, end, width in (
+                    ((clock_x, clock_y - 196), (clock_x, clock_y - 228), 16),
+                    ((clock_x + 196, clock_y), (clock_x + 228, clock_y), 16),
+                    ((clock_x, clock_y + 196), (clock_x, clock_y + 228), 16),
+                    ((clock_x - 196, clock_y), (clock_x - 228, clock_y), 16),
+                    ((clock_x, clock_y), minute_hand, 30),
+                    ((clock_x, clock_y), hour_hand, 38),
+                )
+            ) or clock_distance <= 28:
+                color = CLOCK_FACE
+
+            if badge_distance <= badge_r:
+                color = BADGE_FILL
+                if any(
+                    _segment_distance(px, py, check[i][0], check[i][1], check[i + 1][0], check[i + 1][1]) <= 23
+                    for i in range(len(check) - 1)
+                ):
+                    color = BADGE_CHECK
+            pixels.append(color)
     return pixels
 
 

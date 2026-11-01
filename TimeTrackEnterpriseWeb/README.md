@@ -87,7 +87,7 @@ py -3 -m venv .venv
 
 ## البيانات والنسخ الاحتياطي
 
-مجلد التشغيل الافتراضي هو `data/` بجوار المشروع (أو بجوار `SmartAttendance.exe` في النسخة المحمولة):
+مجلد التشغيل الافتراضي هو `data/` بجوار المشروع (أو بجوار `TimeTrackEnterprise.exe` في النسخة المحمولة):
 
 ```text
 data\
@@ -218,8 +218,8 @@ GDS-Android-Template/         عميل Flutter للمزامنة (خارج تطب
 .venv\Scripts\python.exe scripts\sign_update.py ^
   --version 1.1.20 ^
   --notes "ملاحظات الإصدار" ^
-  --portable dist\SmartAttendance.exe ^
-  --setup dist\SmartAttendance_Setup_1.1.20.exe ^
+  --portable dist\TimeTrackEnterprise.exe ^
+  --setup dist\TimeTrackEnterprise_Setup_1.1.20.exe ^
   --out dist\update\latest.json
 ```
 
@@ -234,7 +234,7 @@ build.bat
 يُنتج:
 
 ```text
-dist\SmartAttendance.exe
+dist\TimeTrackEnterprise.exe
 ```
 
 الملف مستقل ولا يحتاج Python على جهاز المستخدم. تُضمَّن القوالب والملفات الثابتة وكتالوجات اللغات. الملف غير موقّع رقميًا، وقد يعرض SmartScreen تحذيرًا.
@@ -248,7 +248,7 @@ build.bat
 build_setup.bat
 ```
 
-يُنتج `dist\SmartAttendance_Setup_1.1.20.exe` بمعالج عربي واختصارات وأداة إزالة. عند التثبيت في `Program Files` تُحفظ البيانات في `%LOCALAPPDATA%\SmartStudentAttendance\data`.
+يُنتج `dist\TimeTrackEnterprise_Setup_1.1.20.exe` بمعالج عربي واختصارات وأداة إزالة. يحتفظ المثبّت بمسار التثبيت القديم لضمان ترقية النسخ الموجودة دون نقل بياناتها؛ وتبقى البيانات في مسارها الحالي مثل `%LOCALAPPDATA%\SmartStudentAttendance\data` عند استخدام مجلد البيانات الاحتياطي.
 
 ## النشر على خادم
 

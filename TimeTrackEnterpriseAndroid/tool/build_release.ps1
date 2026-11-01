@@ -30,7 +30,7 @@ try {
   flutter test
   if ($LASTEXITCODE -ne 0) { throw 'flutter test failed' }
 
-  $appName = if ([string]::IsNullOrWhiteSpace($env:APP_NAME)) { 'Generic Android Template' } else { $env:APP_NAME }
+  $appName = if ([string]::IsNullOrWhiteSpace($env:APP_NAME)) { 'TimeTrackEnterprise' } else { $env:APP_NAME }
   $locale = if ([string]::IsNullOrWhiteSpace($env:APP_LOCALE)) { 'ar' } else { $env:APP_LOCALE }
   $apiBaseUrl = $env:API_BASE_URL
   flutter build apk --release "--dart-define=APP_NAME=$appName" "--dart-define=APP_LOCALE=$locale" "--dart-define=API_BASE_URL=$apiBaseUrl"

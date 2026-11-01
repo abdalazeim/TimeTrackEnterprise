@@ -4,10 +4,10 @@
 
 | المتغير | مكان الاستخدام | الافتراضي |
 | --- | --- | --- |
-| `APP_NAME` | عنوان Material واسم تطبيق Android وسكربت الإصدار | `Generic Android Template` |
+| `APP_NAME` | عنوان Material واسم تطبيق Android وسكربت الإصدار | `TimeTrackEnterprise` |
 | `APP_LOCALE` | اللغة عند بدء التطبيق (`ar` أو `en`) | `ar` |
 | `API_BASE_URL` | عنوان خادم REST API | `https://api.example.com` |
-| `APP_VERSION` | النص المعروض في واجهة الدخول | `1.0.0` |
+| `APP_VERSION` | إصدار التطبيق المعروض | `4.1.1` |
 | `SYNC_MODELS` | مجموعات السحب المسجلة على الخادم، مفصولة بفاصلة | `example.item` |
 
 مثال تشغيل:

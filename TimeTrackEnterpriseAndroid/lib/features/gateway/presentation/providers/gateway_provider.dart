@@ -42,7 +42,7 @@ class GatewayState {
       apiKey: '',
       pairPin: '',
       deviceId: '',
-      autoStart: false,
+      autoStart: true,
       keepAwake: true,
     ),
     runtime: GatewayRuntime(),
@@ -106,8 +106,7 @@ class GatewayState {
       lastGatewayCode: lastGatewayCode ?? this.lastGatewayCode,
       lastSync: clearLastSync ? null : (lastSync ?? this.lastSync),
       lastPairing: lastPairing ?? this.lastPairing,
-      lastScannerConnect:
-          lastScannerConnect ?? this.lastScannerConnect,
+      lastScannerConnect: lastScannerConnect ?? this.lastScannerConnect,
       ip: ip ?? this.ip,
       initialized: initialized ?? this.initialized,
       busy: busy ?? this.busy,
@@ -424,7 +423,8 @@ class GatewayController extends Notifier<GatewayState> {
     required String role,
     required String code,
   }) async {
-    state = state.copyWith(portalBusy: true, clearError: true, clearMessage: true);
+    state =
+        state.copyWith(portalBusy: true, clearError: true, clearMessage: true);
     try {
       final result = await _service.loginStaff(
         server: server,
@@ -449,7 +449,8 @@ class GatewayController extends Notifier<GatewayState> {
     required String server,
     required String code,
   }) async {
-    state = state.copyWith(portalBusy: true, clearError: true, clearMessage: true);
+    state =
+        state.copyWith(portalBusy: true, clearError: true, clearMessage: true);
     try {
       final result = await _service.loginParent(server: server, code: code);
       state = state.copyWith(

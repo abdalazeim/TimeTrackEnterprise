@@ -26,7 +26,9 @@ class _GatewayHomePageState extends ConsumerState<GatewayHomePage> {
     final strings = AppStrings.of(context);
     final state = ref.watch(gatewayProvider);
     final ctrl = ref.read(gatewayProvider.notifier);
-    final address = 'http://${state.ip == '0.0.0.0' ? '127.0.0.1' : state.ip}:${state.settings.port}';
+    final address = state.ip == '0.0.0.0'
+        ? strings.networkUnavailable
+        : 'http://${state.ip}:${state.settings.port}';
 
     ref.listen<GatewayState>(gatewayProvider, (previous, next) {
       if (next.error != null && next.error != previous?.error) {
@@ -42,7 +44,7 @@ class _GatewayHomePageState extends ConsumerState<GatewayHomePage> {
           SliverToBoxAdapter(
             child: HeroHeader(
               leading: IconButton(
-                onPressed: () => context.pop(),
+                onPressed: () => context.go(Routes.home),
                 icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
               ),
               title: strings.gatewayTitle,
@@ -233,7 +235,8 @@ class _GatewayHomePageState extends ConsumerState<GatewayHomePage> {
                           onChanged: ctrl.toggleKeepAwake,
                           title: Text(strings.keepAwake),
                           subtitle: Text(strings.keepAwakeHint),
-                          secondary: const Icon(Icons.battery_charging_full_rounded),
+                          secondary:
+                              const Icon(Icons.battery_charging_full_rounded),
                         ),
                         const Divider(height: 1),
                         ListTile(
@@ -525,7 +528,9 @@ class _StatusCard extends StatelessWidget {
           Row(
             children: <Widget>[
               IconBadge(
-                icon: running ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
+                icon: running
+                    ? Icons.cloud_done_rounded
+                    : Icons.cloud_off_rounded,
                 tone: running ? AppColors.success : AppColors.amber,
                 size: 46,
               ),
@@ -574,7 +579,9 @@ class _StatusCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
                   .withValues(alpha: 0.45),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -621,9 +628,7 @@ class _StatusCard extends StatelessWidget {
             children: <Widget>[
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: state.busy
-                      ? null
-                      : (running ? onStop : onStart),
+                  onPressed: state.busy ? null : (running ? onStop : onStart),
                   icon: Icon(
                     running ? Icons.stop_rounded : Icons.play_arrow_rounded,
                   ),
@@ -698,13 +703,12 @@ class _PairingCard extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     Text(
-                      showPin
-                          ? (pin.isEmpty ? '—' : pin)
-                          : '••••',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 8,
-                          ),
+                      showPin ? (pin.isEmpty ? '—' : pin) : '••••',
+                      style:
+                          Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 8,
+                              ),
                     ),
                   ],
                 ),
@@ -713,7 +717,9 @@ class _PairingCard extends StatelessWidget {
                 tooltip: showPin ? strings.hideSecret : strings.showSecret,
                 onPressed: pin.isEmpty ? null : onTogglePin,
                 icon: Icon(
-                  showPin ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                  showPin
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
                 ),
               ),
               IconButton(
@@ -763,7 +769,9 @@ class _PairingCard extends StatelessWidget {
                 tooltip: showKey ? strings.hideSecret : strings.showSecret,
                 onPressed: onToggleKey,
                 icon: Icon(
-                  showKey ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                  showKey
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
                 ),
               ),
               IconButton(
@@ -889,9 +897,8 @@ class _OfflineQueueCard extends StatelessWidget {
                               ? Icons.cloud_done_rounded
                               : Icons.cloud_upload_rounded,
                           size: 18,
-                          color: scan.synced
-                              ? AppColors.success
-                              : AppColors.amber,
+                          color:
+                              scan.synced ? AppColors.success : AppColors.amber,
                         ),
                         const SizedBox(width: 8),
                         Expanded(

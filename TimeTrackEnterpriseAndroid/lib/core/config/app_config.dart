@@ -8,13 +8,13 @@ class AppConfig {
   /// اسم التطبيق الظاهر فيlauncher و الشاشة الرئيسية.
   static const String appName = String.fromEnvironment(
     'APP_NAME',
-    defaultValue: 'Generic Android Template',
+    defaultValue: 'TimeTrackEnterprise',
   );
 
   /// يطابق `version:` في `pubspec.yaml`.
   static const String version = String.fromEnvironment(
     'APP_VERSION',
-    defaultValue: '1.0.0',
+    defaultValue: '4.1.1',
   );
 
   static const String defaultLanguage = String.fromEnvironment(

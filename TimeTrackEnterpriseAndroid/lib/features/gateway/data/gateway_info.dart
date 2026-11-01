@@ -4,9 +4,9 @@ import 'dart:io';
 class GatewayInfo {
   const GatewayInfo._();
 
-  static const String appName = 'Attendance Gateway & Companion';
-  static const String gatewayName = 'Attendance SMS Gateway';
-  static const String version = '4.0.0';
+  static const String appName = 'TimeTrackEnterprise';
+  static const String gatewayName = 'TimeTrackEnterprise Gateway';
+  static const String version = '4.1.1';
   static const String userAgent = 'SmartAttendanceGateway/$version';
   static const String lanDiscoveryQuery = 'SMARTATTENDANCE?';
   static const int lanDiscoveryPort = 8866;

@@ -1,7 +1,7 @@
 name: generic_template
 description: Generic Android app template — Flutter + Clean Architecture + Offline-First + RTL support.
 publish_to: "none"
-version: 1.0.0+1
+version: 4.1.1+1
 
 environment:
   sdk: ">=3.4.0 <4.0.0"

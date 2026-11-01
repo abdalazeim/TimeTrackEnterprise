@@ -25,11 +25,13 @@ class AppStrings {
       ? 'استخدم بيانات حسابك للمتابعة.'
       : 'Use your account details to continue.';
   String get username => isArabic ? 'اسم المستخدم' : 'Username';
-  String get usernameHint => isArabic ? 'أدخل اسم المستخدم' : 'Enter your username';
+  String get usernameHint =>
+      isArabic ? 'أدخل اسم المستخدم' : 'Enter your username';
   String get usernameRequired =>
       isArabic ? 'اسم المستخدم مطلوب.' : 'Username is required.';
   String get password => isArabic ? 'كلمة المرور' : 'Password';
-  String get passwordHint => isArabic ? 'أدخل كلمة المرور' : 'Enter your password';
+  String get passwordHint =>
+      isArabic ? 'أدخل كلمة المرور' : 'Enter your password';
   String get passwordRequired =>
       isArabic ? 'كلمة المرور مطلوبة.' : 'Password is required.';
   String get showPassword => isArabic ? 'إظهار كلمة المرور' : 'Show password';
@@ -38,7 +40,8 @@ class AppStrings {
   String get offlineHint => isArabic
       ? 'تُحفظ الجلسة بأمان على هذا الجهاز.'
       : 'Your session is stored securely on this device.';
-  String get quickStart => isArabic ? 'ابدأ من المثال' : 'Start with the sample';
+  String get quickStart =>
+      isArabic ? 'ابدأ من المثال' : 'Start with the sample';
   String get quickStartHint => isArabic
       ? 'استخدم السجلات التجريبية لربط وحدة جديدة بواجهة API.'
       : 'Use sample records to connect a feature to the API.';
@@ -46,7 +49,8 @@ class AppStrings {
   String get exampleRecordsHint => isArabic
       ? 'إنشاء السجلات وتعديلها وحذفها عبر API'
       : 'Create, update, and delete records through the API';
-  String get syncTitle => isArabic ? 'حالة التخزين والمزامنة' : 'Storage and sync status';
+  String get syncTitle =>
+      isArabic ? 'حالة التخزين والمزامنة' : 'Storage and sync status';
   String get syncHint => isArabic
       ? 'ملخص الطابور المحلي وآخر اتصال بالخادم'
       : 'Local queue and last server connection';
@@ -66,11 +70,13 @@ class AppStrings {
   String get refresh => isArabic ? 'تحديث' : 'Refresh';
   String get retry => isArabic ? 'إعادة المحاولة' : 'Try again';
   String get loading => isArabic ? 'جارٍ التحميل…' : 'Loading…';
-  String get preparingSession => isArabic ? 'جارٍ تجهيز الجلسة…' : 'Preparing your session…';
+  String get preparingSession =>
+      isArabic ? 'جارٍ تجهيز الجلسة…' : 'Preparing your session…';
   String get startupHint => isArabic
       ? 'تأكد من الاتصال بالخادم عند تعذر استعادة الجلسة.'
       : 'Check the server connection if your session cannot be restored.';
-  String get loadFailed => isArabic ? 'تعذر تحميل البيانات' : 'Could not load data';
+  String get loadFailed =>
+      isArabic ? 'تعذر تحميل البيانات' : 'Could not load data';
   String get noItems => isArabic ? 'لا توجد سجلات بعد' : 'No records yet';
   String get addItem => isArabic ? 'إضافة سجل' : 'Add record';
   String get editItem => isArabic ? 'تعديل السجل' : 'Edit record';
@@ -83,9 +89,11 @@ class AppStrings {
   String get description => isArabic ? 'الوصف' : 'Description';
   String get quantity => isArabic ? 'الكمية' : 'Quantity';
   String get save => isArabic ? 'حفظ' : 'Save';
-  String get fieldRequired => isArabic ? 'هذا الحقل مطلوب.' : 'This field is required.';
-  String get quantityInvalid =>
-      isArabic ? 'أدخل عددًا صحيحًا غير سالب.' : 'Enter a non-negative whole number.';
+  String get fieldRequired =>
+      isArabic ? 'هذا الحقل مطلوب.' : 'This field is required.';
+  String get quantityInvalid => isArabic
+      ? 'أدخل عددًا صحيحًا غير سالب.'
+      : 'Enter a non-negative whole number.';
   String lastSynced(DateTime? date) {
     if (date == null) return neverSynced;
     final time =
@@ -106,39 +114,47 @@ class AppStrings {
       : 'Run a local HTTP server to bridge attendance devices on your network';
   String get startServer => isArabic ? 'بدء الخادم' : 'Start Server';
   String get stopServer => isArabic ? 'إيقاف الخادم' : 'Stop Server';
-  String get serverRunning => isArabic ? 'الخادم قيد التشغيل' : 'Server is running';
+  String get serverRunning =>
+      isArabic ? 'الخادم قيد التشغيل' : 'Server is running';
   String get serverStopped => isArabic ? 'الخادم متوقف' : 'Server is stopped';
   String get serverAddress => isArabic ? 'عنوان الخادم' : 'Server Address';
   String get serverPort => isArabic ? 'المنفذ' : 'Port';
   String get deviceIp => isArabic ? 'عنوان IP للجهاز' : 'Device IP';
+  String get networkUnavailable => isArabic
+      ? 'لا يوجد اتصال Wi-Fi أو Ethernet نشط'
+      : 'No active Wi-Fi or Ethernet connection';
   String get copyAddress => isArabic ? 'نسخ العنوان' : 'Copy Address';
   String get addressCopied => isArabic ? 'تم نسخ العنوان' : 'Address copied';
-  String get gatewayScanner => isArabic ? 'ماسح الباركود/QR' : 'Barcode/QR Scanner';
-  String get gatewayScannerSetup =>
-      isArabic ? 'إعداد الماسح' : 'Scanner Setup';
+  String get gatewayScanner =>
+      isArabic ? 'ماسح الباركود/QR' : 'Barcode/QR Scanner';
+  String get gatewayScannerSetup => isArabic ? 'إعداد الماسح' : 'Scanner Setup';
   String get gatewayPortal => isArabic ? 'بوابة الربط' : 'Companion Portal';
   String get gatewayCompanion => isArabic ? 'مساعد الربط' : 'Gateway Companion';
   String get gatewayAbout => isArabic ? 'حول التطبيق' : 'About';
-  String get autoStart => isArabic ? 'تشغيل تلقائي عند البدء' : 'Auto-start on boot';
-  String get keepAwake => isArabic
-      ? 'إبقاء الشاشة/الخدمة نشطة'
-      : 'Keep service active';
+  String get autoStart => isArabic
+      ? 'تشغيل تلقائي عند فتح التطبيق'
+      : 'Start gateway when the app opens';
+  String get keepAwake =>
+      isArabic ? 'إبقاء الشاشة/الخدمة نشطة' : 'Keep service active';
   String get notificationChannel =>
       isArabic ? 'خدمة بوابة الحضور' : 'Attendance Gateway Service';
-  String get serviceRunning =>
-      isArabic ? 'خدمة البوابة تعمل في الخلفية' : 'Gateway service is running in background';
+  String get serviceRunning => isArabic
+      ? 'خدمة البوابة تعمل في الخلفية'
+      : 'Gateway service is running in background';
   String get openCompanion => isArabic ? 'فتح المساعد' : 'Open Companion';
   String get pairWithDesktop => isArabic
       ? 'ربط مع تطبيق الحضور على سطح المكتب'
       : 'Pair with Desktop Attendance App';
-  String get instructions => isArabic ? 'تعليمات الاستخدام' : 'Usage Instructions';
+  String get instructions =>
+      isArabic ? 'تعليمات الاستخدام' : 'Usage Instructions';
   String get instructionsText => isArabic
-      ? '1. تأكد من اتصال الجهازين بنفس شبكة Wi-Fi\n2. شغّل الخادم على هذا الجهاز\n3. أدخل عنوان الخادم في تطبيق سطح المكتب'
-      : '1. Ensure both devices are on the same Wi-Fi network\n2. Start the server on this device\n3. Enter the server address in the desktop app';
+      ? '1. صِل الجهازين بالشبكة المحلية نفسها عبر Wi-Fi أو Ethernet\n2. شغّل الخادم على هذا الجهاز\n3. أدخل عنوان الخادم في تطبيق سطح المكتب'
+      : '1. Connect both devices to the same Wi-Fi or Ethernet LAN\n2. Start the server on this device\n3. Enter the server address in the desktop app';
 
   // Gateway — live status and settings
   String get gatewayStatus => isArabic ? 'حالة البوابة' : 'Gateway status';
-  String get gatewayStarting => isArabic ? 'جارٍ تشغيل الخادم…' : 'Starting server…';
+  String get gatewayStarting =>
+      isArabic ? 'جارٍ تشغيل الخادم…' : 'Starting server…';
   String get gatewayRunningHint => isArabic
       ? 'جاهز لاستقبال طلبات سطح المكتب ورسائل SMS'
       : 'Ready for desktop requests and SMS delivery';
@@ -148,7 +164,8 @@ class AppStrings {
   String get pendingScans => isArabic ? 'مسحات معلّقة' : 'Pending scans';
   String get receivedScans => isArabic ? 'مسحات مستلمة' : 'Received scans';
   String get offlineToday => isArabic ? 'حضور اليوم' : 'Today attendance';
-  String get offlinePending => isArabic ? 'بانتظار المزامنة' : 'Waiting to sync';
+  String get offlinePending =>
+      isArabic ? 'بانتظار المزامنة' : 'Waiting to sync';
   String get pairingCode => isArabic ? 'رمز الربط' : 'Pairing code';
   String get apiKey => isArabic ? 'مفتاح API' : 'API key';
   String get showSecret => isArabic ? 'إظهار' : 'Show';
@@ -183,12 +200,17 @@ class AppStrings {
   String get restartServer => isArabic ? 'إعادة تشغيل' : 'Restart';
   String get startedMessage => isArabic ? 'تم تشغيل الخادم' : 'Server started';
   String get stoppedMessage => isArabic ? 'تم إيقاف الخادم' : 'Server stopped';
-  String get restartedMessage => isArabic ? 'تمت إعادة تشغيل الخادم' : 'Server restarted';
-  String get queueCleared => isArabic ? 'تم تفريغ قائمة المسحات' : 'Scan queue cleared';
-  String get keyRegenerated => isArabic ? 'تم توليد مفتاح API جديد' : 'New API key generated';
-  String get pinRegenerated => isArabic ? 'تم توليد رمز ربط جديد' : 'New pairing code generated';
+  String get restartedMessage =>
+      isArabic ? 'تمت إعادة تشغيل الخادم' : 'Server restarted';
+  String get queueCleared =>
+      isArabic ? 'تم تفريغ قائمة المسحات' : 'Scan queue cleared';
+  String get keyRegenerated =>
+      isArabic ? 'تم توليد مفتاح API جديد' : 'New API key generated';
+  String get pinRegenerated =>
+      isArabic ? 'تم توليد رمز ربط جديد' : 'New pairing code generated';
   String get settings => isArabic ? 'الإعدادات' : 'Settings';
-  String get gatewaySettings => isArabic ? 'إعدادات البوابة' : 'Gateway settings';
+  String get gatewaySettings =>
+      isArabic ? 'إعدادات البوابة' : 'Gateway settings';
   String get autoStartHint => isArabic
       ? 'تشغيل الخادم تلقائيًا عند فتح التطبيق'
       : 'Start the server automatically when the app opens';
@@ -201,34 +223,40 @@ class AppStrings {
   String get sharedNetworkHint => isArabic
       ? 'يجب أن يكون الهاتف والكمبيوتر على نفس شبكة Wi-Fi.'
       : 'The phone and desktop must be on the same Wi-Fi network.';
-  String get pcConnected => isArabic ? 'تم الاتصال بسطح المكتب' : 'Desktop connected';
-  String get pcWaiting => isArabic ? 'بانتظار سطح المكتب' : 'Waiting for desktop';
-  String lastPcContact(String value) => isArabic
-      ? 'آخر اتصال: $value'
-      : 'Last contact: $value';
+  String get pcConnected =>
+      isArabic ? 'تم الاتصال بسطح المكتب' : 'Desktop connected';
+  String get pcWaiting =>
+      isArabic ? 'بانتظار سطح المكتب' : 'Waiting for desktop';
+  String lastPcContact(String value) =>
+      isArabic ? 'آخر اتصال: $value' : 'Last contact: $value';
   String get endpoints => isArabic ? 'نقاط النهاية' : 'Endpoints';
   String get endpointHealth => isArabic ? 'الحالة والفحص' : 'Status and health';
   String get endpointScans => isArabic ? 'قراءة المسحات' : 'Read scans';
-  String get endpointPair => isArabic ? 'تبادل رمز الربط' : 'Exchange pairing code';
+  String get endpointPair =>
+      isArabic ? 'تبادل رمز الربط' : 'Exchange pairing code';
   String get endpointSend => isArabic ? 'إرسال رسالة SMS' : 'Send an SMS';
 
   // Gateway — scanner
-  String get scannerModeGateway => isArabic ? 'مسح لسطح المكتب' : 'Desktop scans';
-  String get scannerModeOffline => isArabic ? 'حضور بدون اتصال' : 'Offline attendance';
+  String get scannerModeGateway =>
+      isArabic ? 'مسح لسطح المكتب' : 'Desktop scans';
+  String get scannerModeOffline =>
+      isArabic ? 'حضور بدون اتصال' : 'Offline attendance';
   String get scannerGatewayHint => isArabic
       ? 'تظهر كل مسحة مباشرة لتطبيق سطح المكتب عبر /scans.'
       : 'Every scan appears immediately to the desktop app through /scans.';
   String get scannerOfflineHint => isArabic
       ? 'تُحفظ المسحات محليًا وتُزامن عند توفر الاتصال.'
       : 'Scans are stored locally and synced when the connection returns.';
-  String get scannerManualHint => isArabic ? 'أدخل الرمز يدويًا' : 'Enter the code manually';
+  String get scannerManualHint =>
+      isArabic ? 'أدخل الرمز يدويًا' : 'Enter the code manually';
   String get submit => isArabic ? 'إرسال' : 'Submit';
   String get scannerLastScan => isArabic ? 'آخر مسحة' : 'Last scan';
   String get scannerNoScan => isArabic
       ? 'وجّه الكاميرا إلى الباركود أو أدخل الرمز يدويًا.'
       : 'Point the camera at a barcode or enter the code manually.';
   String get scannerTorch => isArabic ? 'الفلاش' : 'Flashlight';
-  String get scannerSwitchCamera => isArabic ? 'تبديل الكاميرا' : 'Switch camera';
+  String get scannerSwitchCamera =>
+      isArabic ? 'تبديل الكاميرا' : 'Switch camera';
   String scannerQueued(int seq) => isArabic
       ? 'تمت إضافة المسحة إلى قائمة سطح المكتب (#$seq).'
       : 'Scan added to the desktop queue (#$seq).';
@@ -238,9 +266,8 @@ class AppStrings {
   String scannerOfflineQueued(String name, String status) => isArabic
       ? 'تم حفظ حضور $name: $status'
       : 'Saved attendance for $name: $status';
-  String scannerOfflineStatus(String name, String status) => isArabic
-      ? '$name: $status'
-      : '$name: $status';
+  String scannerOfflineStatus(String name, String status) =>
+      isArabic ? '$name: $status' : '$name: $status';
   String get scannerNeedsSetup => isArabic
       ? 'اربط الماسح أولًا من إعداد الماسح.'
       : 'Connect the scanner from Scanner Setup first.';
@@ -258,10 +285,12 @@ class AppStrings {
   String get staffRequired => isArabic
       ? 'يلزم تسجيل دخول الموظف من بوابة الربط.'
       : 'Staff sign-in through the Companion Portal is required.';
-  String get rosterVersionLabel => isArabic ? 'إصدار القائمة' : 'Roster version';
+  String get rosterVersionLabel =>
+      isArabic ? 'إصدار القائمة' : 'Roster version';
   String get studentsCount => isArabic ? 'الطلاب' : 'Students';
   String get periodsCount => isArabic ? 'الحصص' : 'Periods';
-  String get lastRosterSync => isArabic ? 'آخر تنزيل للقائمة' : 'Roster downloaded';
+  String get lastRosterSync =>
+      isArabic ? 'آخر تنزيل للقائمة' : 'Roster downloaded';
   String get lastSyncLabel => isArabic ? 'آخر مزامنة' : 'Last sync';
   String get never => isArabic ? 'لم يحدث بعد' : 'Never';
   String scanCounter(int today, int pending) => isArabic
@@ -273,8 +302,9 @@ class AppStrings {
   String get scannerSetupDescription => isArabic
       ? 'اطلب رمز تسجيل الجهاز المكوّن من 8 أرقام من لوحة تحكم الحضور، ثم اربط هذا الهاتف.'
       : 'Request the 8-digit device passcode from the attendance dashboard, then connect this phone.';
-  String get serverAddressHint =>
-      isArabic ? 'مثال: http://192.168.1.20:8080' : 'e.g. http://192.168.1.20:8080';
+  String get serverAddressHint => isArabic
+      ? 'مثال: http://192.168.1.20:8080'
+      : 'e.g. http://192.168.1.20:8080';
   String get passcode => isArabic ? 'رمز الجهاز' : 'Device passcode';
   String get passcodeHint => isArabic ? '8 أرقام' : '8 digits';
   String get passcodeRequired => isArabic
@@ -286,10 +316,13 @@ class AppStrings {
   String get connectScanner => isArabic ? 'ربط الماسح' : 'Connect scanner';
   String get connecting => isArabic ? 'جارٍ الاتصال…' : 'Connecting…';
   String get discoverServer => isArabic ? 'بحث تلقائي' : 'Auto-detect';
-  String get discovering => isArabic ? 'جارٍ البحث في الشبكة…' : 'Searching the network…';
+  String get discovering =>
+      isArabic ? 'جارٍ البحث في الشبكة…' : 'Searching the network…';
   String get serverFound => isArabic ? 'تم العثور على الخادم' : 'Server found';
-  String get serverNotFound => isArabic ? 'لم يتم العثور على خادم' : 'No server found';
-  String get scannerConnected => isArabic ? 'تم ربط الماسح' : 'Scanner connected';
+  String get serverNotFound =>
+      isArabic ? 'لم يتم العثور على خادم' : 'No server found';
+  String get scannerConnected =>
+      isArabic ? 'تم ربط الماسح' : 'Scanner connected';
   String get scannerPending => isArabic
       ? 'بانتظار موافقة الإدارة على الجهاز'
       : 'Waiting for administrator approval';
@@ -301,7 +334,8 @@ class AppStrings {
       ? 'اطلب من الإدارة الموافقة على الجهاز ثم اضغط تحديث.'
       : 'Ask the administrator to approve the device, then tap Refresh.';
   String get refreshStatus => isArabic ? 'تحديث الحالة' : 'Refresh status';
-  String get disconnectScanner => isArabic ? 'فصل الماسح' : 'Disconnect scanner';
+  String get disconnectScanner =>
+      isArabic ? 'فصل الماسح' : 'Disconnect scanner';
   String get disconnectScannerPrompt => isArabic
       ? 'سيتم حذف جلسة الماسح من هذا الجهاز. تبقى المسحات المحفوظة في الطابور.'
       : 'The scanner session will be removed from this device. Saved scans stay queued.';
@@ -316,13 +350,15 @@ class AppStrings {
   String get companionRole => isArabic ? 'الدور' : 'Role';
   String get companionServer => isArabic ? 'الخادم' : 'Server';
   String get approved => isArabic ? 'معتمد' : 'Approved';
-  String get pendingApproval => isArabic ? 'بانتظار الموافقة' : 'Pending approval';
+  String get pendingApproval =>
+      isArabic ? 'بانتظار الموافقة' : 'Pending approval';
   String get blocked => isArabic ? 'محظور' : 'Blocked';
   String get notConnected => isArabic ? 'غير متصل' : 'Not connected';
   String get companionNoSessionHint => isArabic
       ? 'لم يتم ربط الماسح بعد. ابدأ من إعداد الماسح لربط هذا الهاتف بالخادم.'
       : 'The scanner is not connected yet. Start with Scanner Setup to pair this phone.';
-  String get openScannerSetup => isArabic ? 'فتح إعداد الماسح' : 'Open Scanner Setup';
+  String get openScannerSetup =>
+      isArabic ? 'فتح إعداد الماسح' : 'Open Scanner Setup';
   String get syncOffline => isArabic ? 'مزامنة البيانات' : 'Sync data';
   String get deviceIdLabel => isArabic ? 'معرّف الجهاز' : 'Device ID';
   String get copy => isArabic ? 'نسخ' : 'Copy';
@@ -370,23 +406,29 @@ class AppStrings {
   String get sessionExpired => isArabic
       ? 'انتهت الجلسة. سجّل الدخول مرة أخرى.'
       : 'The session ended. Sign in again.';
-  String get staffSignedIn => isArabic ? 'تم تسجيل دخول الموظف' : 'Staff signed in';
-  String get parentSignedIn => isArabic ? 'تم تسجيل دخول ولي الأمر' : 'Parent signed in';
+  String get staffSignedIn =>
+      isArabic ? 'تم تسجيل دخول الموظف' : 'Staff signed in';
+  String get parentSignedIn =>
+      isArabic ? 'تم تسجيل دخول ولي الأمر' : 'Parent signed in';
   String get portalSignedOut => isArabic ? 'تم تسجيل الخروج' : 'Signed out';
-  String get teacherDashboard => isArabic ? 'لوحة المتابعة' : 'Attendance dashboard';
+  String get teacherDashboard =>
+      isArabic ? 'لوحة المتابعة' : 'Attendance dashboard';
   String get openDashboard => isArabic ? 'عرض لوحة المتابعة' : 'Open dashboard';
-  String get parentChildren => isArabic ? 'الأبناء المرتبطون' : 'Linked children';
-  String get noChildren => isArabic
-      ? 'لا يوجد أبناء مرتبطون بعد.'
-      : 'No linked children yet.';
+  String get parentChildren =>
+      isArabic ? 'الأبناء المرتبطون' : 'Linked children';
+  String get noChildren =>
+      isArabic ? 'لا يوجد أبناء مرتبطون بعد.' : 'No linked children yet.';
   String get parentOverview => isArabic ? 'ملخص الحضور' : 'Attendance overview';
-  String get attendance30 => isArabic ? 'حضور آخر 30 يومًا' : 'Attendance — last 30 days';
-  String get noAttendance => isArabic ? 'لا توجد سجلات حضور' : 'No attendance records';
+  String get attendance30 =>
+      isArabic ? 'حضور آخر 30 يومًا' : 'Attendance — last 30 days';
+  String get noAttendance =>
+      isArabic ? 'لا توجد سجلات حضور' : 'No attendance records';
   String get noPortalData => isArabic ? 'لا توجد بيانات' : 'No data available';
   String get summary => isArabic ? 'الملخص' : 'Summary';
   String get details => isArabic ? 'التفاصيل' : 'Details';
   String get notifications => isArabic ? 'الإشعارات' : 'Notifications';
-  String get noNotifications => isArabic ? 'لا توجد إشعارات' : 'No notifications';
+  String get noNotifications =>
+      isArabic ? 'لا توجد إشعارات' : 'No notifications';
   String get markAllRead => isArabic ? 'تحديد الكل كمقروء' : 'Mark all as read';
   String get removeChild => isArabic ? 'إزالة' : 'Remove';
   String get removeChildPrompt => isArabic
@@ -403,9 +445,12 @@ class AppStrings {
   String get sendSms => isArabic ? 'إرسال SMS' : 'Send SMS';
   String get phoneNumber => isArabic ? 'رقم الهاتف' : 'Phone number';
   String get messageBody => isArabic ? 'نص الرسالة' : 'Message';
-  String get phoneRequired => isArabic ? 'أدخل رقم هاتف صحيحًا.' : 'Enter a valid phone number.';
-  String get messageRequired => isArabic ? 'أدخل نص الرسالة.' : 'Enter the message.';
-  String get smsQueued => isArabic ? 'تم تسليم الرسالة إلى نظام SMS' : 'SMS handed to the system';
+  String get phoneRequired =>
+      isArabic ? 'أدخل رقم هاتف صحيحًا.' : 'Enter a valid phone number.';
+  String get messageRequired =>
+      isArabic ? 'أدخل نص الرسالة.' : 'Enter the message.';
+  String get smsQueued =>
+      isArabic ? 'تم تسليم الرسالة إلى نظام SMS' : 'SMS handed to the system';
   String get smsStaffRequired => isArabic
       ? 'سجّل الدخول كموظف أولًا لإرسال الرسائل.'
       : 'Sign in as staff before sending messages.';
@@ -416,15 +461,17 @@ class AppStrings {
   String get send => isArabic ? 'إرسال' : 'Send';
   String get done => isArabic ? 'تم' : 'Done';
   String get ok => isArabic ? 'حسنًا' : 'OK';
-  String get unknownError => isArabic ? 'حدث خطأ غير متوقع.' : 'An unexpected error occurred.';
+  String get unknownError =>
+      isArabic ? 'حدث خطأ غير متوقع.' : 'An unexpected error occurred.';
   String get gatewayVersion => isArabic ? 'إصدار البوابة' : 'Gateway version';
-  String get protocolTitle => isArabic ? 'بروتوكول الاتصال' : 'Communication protocol';
+  String get protocolTitle =>
+      isArabic ? 'بروتوكول الاتصال' : 'Communication protocol';
   String get aboutDescription => isArabic
       ? 'بوابة محلية تحوّل هذا الهاتف إلى جسر بين تطبيق سطح المكتب وأجهزة الحضور، وتدعم إرسال SMS والمسح بدون اتصال.'
       : 'A local gateway that turns this phone into a bridge between the desktop app and attendance devices, with SMS delivery and offline scanning.';
   String get licenseNote => isArabic
-      ? 'مبني على بروتوكول تطبيق Attendance Gateway & Companion 4.0.0.'
-      : 'Built on the Attendance Gateway & Companion 4.0.0 protocol.';
+      ? 'مبني على بروتوكول تطبيق TimeTrack Enterprise Gateway 4.1.1.'
+      : 'Built on the TimeTrack Enterprise Gateway 4.1.1 protocol.';
 
   /// Localised text for error/status codes produced by the gateway provider.
   String errorText(String? code) {

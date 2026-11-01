@@ -941,6 +941,58 @@
     });
   }
 
+  async function loadMobileStaffUsers() {
+    const select = $("mobile-staff-user");
+    if (!select) return;
+    try {
+      const data = await A.api("/api/users");
+      const users = Array.isArray(data.users) ? data.users.filter((user) => user.is_active) : [];
+      select.innerHTML = '<option value="">اختر حسابًا</option>' + users.map((user) =>
+        `<option value="${Number(user.id)}">${safe(user.display_name || user.username)} — ${safe(user.username)} (${user.role === "admin" ? "مدير" : "موظف"})</option>`
+      ).join("");
+      $("mobile-staff-code-issue").disabled = users.length === 0;
+    } catch (error) {
+      select.innerHTML = '<option value="">تعذر تحميل الحسابات</option>';
+    }
+  }
+
+  function bindMobileStaffCodes() {
+    const button = $("mobile-staff-code-issue");
+    if (!button) return;
+    $("mobile-staff-user").addEventListener("change", () => {
+      button.disabled = !$("mobile-staff-user").value;
+    });
+    button.addEventListener("click", async () => {
+      const userId = Number($("mobile-staff-user").value);
+      if (!userId) return;
+      $("mobile-staff-code-result").classList.add("hidden");
+      A.setBusy(button, true);
+      try {
+        const data = await A.api("/api/mobile/staff-codes", {
+          method: "POST",
+          body: { user_id: userId },
+        });
+        $("mobile-staff-code").textContent = data.code || "";
+        $("mobile-staff-code-expiry").textContent = `صالح حتى ${String(data.expires_at || "").replace("T", " ")}`;
+        $("mobile-staff-code-result").classList.remove("hidden");
+        A.toast("تم إصدار رمز الدخول. انسخه وشاركه مع الموظف الآن.", "success");
+      } catch (error) {
+        A.toast(error.message || "تعذر إصدار رمز الدخول.", "error");
+      } finally {
+        A.setBusy(button, false);
+      }
+    });
+    $("mobile-staff-code-copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText($("mobile-staff-code").textContent || "");
+        A.toast("تم نسخ الرمز.", "success");
+      } catch (error) {
+        A.toast("حدد الرمز وانسخه يدويًا.", "info");
+      }
+    });
+    loadMobileStaffUsers();
+  }
+
   function initNavSpy() {
     const links = Array.from(document.querySelectorAll(".settings-nav a[href^='#']"));
     const sections = links
@@ -972,6 +1024,7 @@
     bindSmsForm();
     bindPeriods();
     bindDataActions();
+    bindMobileStaffCodes();
     initNavSpy();
     loadAll(true);
     loadGatewayStatus();

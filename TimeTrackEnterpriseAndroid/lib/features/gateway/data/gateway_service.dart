@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+
 import '../domain/entities/companion_session.dart';
 import '../domain/entities/gateway_settings.dart';
 import '../domain/entities/offline_scan.dart';
@@ -91,7 +94,7 @@ class GatewayService {
     apiKey: '',
     pairPin: '',
     deviceId: '',
-    autoStart: false,
+    autoStart: true,
     keepAwake: true,
   );
   String _ip = '0.0.0.0';
@@ -100,7 +103,8 @@ class GatewayService {
 
   GatewaySettings get settings => _settings;
   GatewayRuntime get runtime => _runtime;
-  CompanionSession get companion => _prefs?.companion() ?? CompanionSession.empty;
+  CompanionSession get companion =>
+      _prefs?.companion() ?? CompanionSession.empty;
   PortalSnapshot get portal => _prefs?.portal() ?? PortalSnapshot.empty;
   String get ip => _ip;
   String get deviceId => _settings.deviceId;
@@ -108,7 +112,7 @@ class GatewayService {
   bool get syncing => _syncing;
 
   String get serverAddress =>
-      'http://${_ip == '0.0.0.0' || _ip.isEmpty ? '127.0.0.1' : _ip}:${_settings.port}';
+      _ip == '0.0.0.0' || _ip.isEmpty ? '' : 'http://${_ip}:${_settings.port}';
 
   GatewayPrefs get _storePrefs {
     final prefs = _prefs;
@@ -142,22 +146,78 @@ class GatewayService {
   }
 
   Future<String> detectIp() async {
+    // Android can identify the active Wi-Fi/Ethernet route directly. Prefer it
+    // over enumerating every interface, which may include VPN and virtual NICs.
+    try {
+      final active = await const MethodChannel('timetrack/network')
+          .invokeMapMethod<String, String>('activeIpv4');
+      final address = active?['ipv4'];
+      if (address != null && _isUsableIpv4(address)) return address;
+    } on PlatformException catch (_) {
+      // Fall back to the interface list below.
+    } on MissingPluginException catch (_) {
+      // The native route channel is Android-only.
+    }
     try {
       final interfaces = await NetworkInterface.list(
         type: InternetAddressType.IPv4,
         includeLoopback: false,
       );
+      final candidates =
+          <({int interfaceRank, int addressRank, String address})>[];
       for (final interface in interfaces) {
+        final name = interface.name.toLowerCase();
+        if (RegExp(r'^(tun|tap|wg|ppp|rmnet|ccmni|veth|docker|lo)')
+            .hasMatch(name)) {
+          continue;
+        }
+        final interfaceRank =
+            RegExp(r'^(wlan|wifi|wi-fi|eth|en\d|ethernet)').hasMatch(name)
+                ? 0
+                : 1;
         for (final address in interface.addresses) {
-          if (!address.isLoopback && !address.isLinkLocal) {
-            return address.address;
+          if (address.type != InternetAddressType.IPv4 ||
+              address.isLoopback ||
+              address.isLinkLocal ||
+              address.rawAddress.first >= 224) {
+            continue;
           }
+          candidates.add((
+            interfaceRank: interfaceRank,
+            addressRank: _isPrivateLanAddress(address) ? 0 : 1,
+            address: address.address,
+          ));
         }
       }
+      candidates.sort((a, b) {
+        final adapter = a.interfaceRank.compareTo(b.interfaceRank);
+        if (adapter != 0) return adapter;
+        final privateAddress = a.addressRank.compareTo(b.addressRank);
+        if (privateAddress != 0) return privateAddress;
+        return a.address.compareTo(b.address);
+      });
+      if (candidates.isNotEmpty) return candidates.first.address;
     } catch (_) {
-      // Fall back to the loopback address below.
+      // Fall back to the no-address state below.
     }
     return '0.0.0.0';
+  }
+
+  bool _isUsableIpv4(String value) {
+    final address = InternetAddress.tryParse(value);
+    return address != null &&
+        address.type == InternetAddressType.IPv4 &&
+        !address.isLoopback &&
+        !address.isLinkLocal &&
+        address.rawAddress.first < 224;
+  }
+
+  bool _isPrivateLanAddress(InternetAddress address) {
+    final octets = address.rawAddress;
+    if (octets.length != 4) return false;
+    return octets[0] == 10 ||
+        (octets[0] == 172 && octets[1] >= 16 && octets[1] <= 31) ||
+        (octets[0] == 192 && octets[1] == 168);
   }
 
   Future<void> refreshIp() async {
@@ -197,12 +257,14 @@ class GatewayService {
         port: _settings.port,
       );
       await prefs.setShouldRun(true);
+      if (_settings.keepAwake) await _setKeepAwake(true);
     } on SocketException catch (error) {
       _server = null;
       _runtime = _runtime.copyWith(
         running: false,
         starting: false,
-        error: 'Port ${_settings.port} is already in use (${error.osError?.message ?? 'bind failed'})',
+        error:
+            'Port ${_settings.port} is already in use (${error.osError?.message ?? 'bind failed'})',
       );
       rethrow;
     } catch (error) {
@@ -221,6 +283,7 @@ class GatewayService {
     _server = null;
     await server?.stop();
     await _storePrefs.setShouldRun(false);
+    await _setKeepAwake(false);
     _runtime = _runtime.copyWith(
       running: false,
       starting: false,
@@ -279,9 +342,23 @@ class GatewayService {
     _settings = _settings.copyWith(autoStart: value);
   }
 
+  Future<void> _setKeepAwake(bool enabled) async {
+    if (!Platform.isAndroid) return;
+    try {
+      if (enabled) {
+        await WakelockPlus.enable();
+      } else {
+        await WakelockPlus.disable();
+      }
+    } catch (_) {
+      // The local HTTP gateway remains available if the screen lock fails.
+    }
+  }
+
   Future<void> setKeepAwake(bool value) async {
     await _storePrefs.setKeepAwake(value);
     _settings = _settings.copyWith(keepAwake: value);
+    if (_runtime.running) await _setKeepAwake(value);
   }
 
   Future<void> regenerateApiKey() async {
@@ -374,8 +451,7 @@ class GatewayService {
     }
   }
 
-  Future<DevicePairingResult> refreshCompanion() =>
-      _devicePairing.refresh();
+  Future<DevicePairingResult> refreshCompanion() => _devicePairing.refresh();
 
   Future<ScannerConnectResult> connectScanner({
     required String server,
@@ -562,8 +638,7 @@ class GatewayService {
 
   Future<void> logoutPortal() => portalService.logout();
 
-  Future<PortalDataResult> staffDashboard() =>
-      portalService.staffDashboard();
+  Future<PortalDataResult> staffDashboard() => portalService.staffDashboard();
 
   Future<PortalDataResult> parentData(PortalChild child) =>
       portalService.parentData(child);

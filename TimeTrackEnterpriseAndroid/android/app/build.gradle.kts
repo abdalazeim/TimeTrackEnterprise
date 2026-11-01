@@ -16,10 +16,10 @@ val hasReleaseSigning = listOf(
 ).all { !it.isNullOrBlank() }
 
 android {
-    namespace = "com.example.generic_template"
+    namespace = "com.timetrack.enterprise"
     val configuredAppName = System.getenv("APP_NAME")
         ?.takeIf { it.isNotBlank() }
-        ?: "Generic Android Template"
+        ?: "TimeTrackEnterprise"
     compileSdk = flutter.compileSdkVersion
     // لا توجد إضافات أصلية مكتوبة بـC/C++ في هذا المشروع، لذا لا حاجة إلى NDK.
     // حذف السطر يمنع Gradle من محاولة تنزيل نسخة NDK غير مثبتة.
@@ -31,7 +31,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.generic_template"
+        applicationId = "com.timetrack.enterprise"
         manifestPlaceholders["appName"] = configuredAppName
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -97,7 +97,7 @@ kotlin {
 // حتى يظهر الملف للعميل بالاسم الصحيح بعد كل عملية بناء.
 val templateAppName = System.getenv("APP_NAME")
     ?.takeIf { it.isNotBlank() }
-    ?: "Generic Android Template"
+    ?: "TimeTrackEnterprise"
 val templateApkName = "$templateAppName.apk"
 
 tasks.register("publishTemplateApk") {

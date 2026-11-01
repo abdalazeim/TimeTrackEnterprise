@@ -1,7 +1,7 @@
 #requires -Version 5.1
-# Builds the Windows-facing deliverables for the Generic Android Template:
+# Builds the Windows-facing deliverables for the TimeTrackEnterprise:
 #   dist\<template name>.apk   (published by the Gradle task publishTemplateApk)
-#   dist\generic_template.ico  (multi-resolution icon: 16..256 px)
+#   dist\timetrackenterprise.ico  (multi-resolution icon: 16..256 px)
 #   dist\<template name>.lnk   (shortcut with the branded icon)
 #   dist\readme.txt            (install steps)
 # and optionally mirrors the shortcut (not the APK) to the Desktop.
@@ -31,7 +31,7 @@ if (Test-Path $pubspecPath) {
 }
 $versionLabel = if ($versionName) { "$versionName (build $versionCode)" } else { 'Not specified' }
 
-$appName = if ([string]::IsNullOrWhiteSpace($env:APP_NAME)) { 'Generic Android Template' } else { $env:APP_NAME }
+$appName = if ([string]::IsNullOrWhiteSpace($env:APP_NAME)) { 'TimeTrackEnterprise' } else { $env:APP_NAME }
 $apkName = "$appName.apk"
 $readmeName = 'readme.txt'
 
@@ -68,7 +68,7 @@ foreach ($size in $sizes) {
 }
 $master.Dispose()
 
-$icoPath = Join-Path $dist 'generic_template.ico'
+$icoPath = Join-Path $dist 'timetrackenterprise.ico'
 $headerSize = 6 + (16 * $frames.Count)
 $offset = $headerSize
 $writer = [System.IO.BinaryWriter]::new([System.IO.File]::Open($icoPath, [System.IO.FileMode]::Create))

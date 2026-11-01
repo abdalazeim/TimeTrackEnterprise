@@ -14,12 +14,12 @@ New-Item -ItemType Directory -Force -Path $previewDir | Out-Null
 $Utf8NoBom = New-Object System.Text.UTF8Encoding -ArgumentList $false
 
 # Brand palette (matches AppTheme.seed / AppTheme.accent)
-$Deep = [System.Drawing.Color]::FromArgb(255, 7, 53, 42)
-$GreenMid = [System.Drawing.Color]::FromArgb(255, 15, 107, 82)
-$Green = [System.Drawing.Color]::FromArgb(255, 30, 156, 116)
-$Gold = [System.Drawing.Color]::FromArgb(255, 224, 166, 60)
-$GoldLight = [System.Drawing.Color]::FromArgb(255, 246, 206, 116)
-$GoldDeep = [System.Drawing.Color]::FromArgb(255, 216, 149, 36)
+$Deep = [System.Drawing.Color]::FromArgb(255, 11, 27, 48)
+$GreenMid = [System.Drawing.Color]::FromArgb(255, 18, 56, 91)
+$Green = [System.Drawing.Color]::FromArgb(255, 36, 102, 155)
+$Gold = [System.Drawing.Color]::FromArgb(255, 72, 224, 178)
+$GoldLight = [System.Drawing.Color]::FromArgb(255, 134, 245, 213)
+$GoldDeep = [System.Drawing.Color]::FromArgb(255, 37, 190, 145)
 $White = [System.Drawing.Color]::White
 $Transparent = [System.Drawing.Color]::FromArgb(0, 0, 0, 0)
 
@@ -122,32 +122,33 @@ function Draw-Emblem {
   $G.TranslateTransform([float]$CX, [float]$CY)
   $G.ScaleTransform([float]$Scale, [float]$Scale)
 
-  $primary = if ($Mono) { $White } else { $Gold }
-  $secondary = $White
-  $positions = @(
-    @(-300, -300),
-    @(40, -300),
-    @(-300, 40),
-    @(40, 40)
-  )
-  $fills = @($primary, $secondary, $secondary, $primary)
-  for ($index = 0; $index -lt $positions.Count; $index++) {
-    $x = $positions[$index][0]
-    $y = $positions[$index][1]
-    $tile = New-RoundedPath $x $y 260 260 54
-    $brush = [System.Drawing.SolidBrush]::new($fills[$index])
-    $G.FillPath($brush, $tile)
-    $brush.Dispose()
-    $tile.Dispose()
-  }
+  $accent = if ($Mono) { $White } else { $Gold }
+  $ring = [System.Drawing.Pen]::new($White, 52)
+  $ring.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $ring.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $G.DrawEllipse($ring, -275, -275, 550, 550)
+  $ring.Dispose()
 
-  $centerColor = if ($Mono) { $White } else { $GreenMid }
-  $center = [System.Drawing.SolidBrush]::new($centerColor)
-  $G.FillEllipse($center, -32, -32, 64, 64)
-  $center.Dispose()
+  $hands = [System.Drawing.Pen]::new($White, 58)
+  $hands.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $hands.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $G.DrawLine($hands, 0, -160, 0, 0)
+  $G.DrawLine($hands, 0, 0, 118, 72)
+  $hands.Dispose()
+
+  $check = [System.Drawing.Pen]::new($accent, 64)
+  $check.StartCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $check.EndCap = [System.Drawing.Drawing2D.LineCap]::Round
+  $check.LineJoin = [System.Drawing.Drawing2D.LineJoin]::Round
+  $points = [System.Drawing.PointF[]]@(
+    [System.Drawing.PointF]::new(-115, 108),
+    [System.Drawing.PointF]::new(-35, 185),
+    [System.Drawing.PointF]::new(145, 5)
+  )
+  $G.DrawLines($check, $points)
+  $check.Dispose()
   $G.Restore($state)
 }
-
 function New-Canvas {
   $bitmap = [System.Drawing.Bitmap]::new(1024, 1024, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
   $bitmap.SetResolution(96, 96)
@@ -260,9 +261,9 @@ $backgroundShape = @'
     android:shape="rectangle">
     <gradient
         android:angle="45"
-        android:centerColor="#0F6B52"
-        android:endColor="#1E9C74"
-        android:startColor="#07352A"
+        android:centerColor="#12385B"
+        android:endColor="#24669B"
+        android:startColor="#0B1B30"
         android:type="linear" />
 </shape>
 '@
@@ -270,7 +271,7 @@ $backgroundShape = @'
 $colorsXml = @'
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="splash_background">#07352A</color>
+    <color name="splash_background">#0B1B30</color>
 </resources>
 '@
 

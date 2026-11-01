@@ -20,7 +20,7 @@ def database_path() -> Path:
         return Path(configured)
     return Path(settings.DATABASES["default"]["NAME"])
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS app_meta (
@@ -222,6 +222,59 @@ CREATE TABLE IF NOT EXISTS message_outbox (
 );
 CREATE INDEX IF NOT EXISTS idx_outbox_campaign ON message_outbox(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_outbox_status ON message_outbox(delivery_status);
+-- Mobile companion credentials and parent notification state.
+CREATE TABLE IF NOT EXISTS mobile_staff_codes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    code_hash TEXT NOT NULL,
+    issued_by INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+    expires_at TEXT NOT NULL,
+    revoked_at TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (issued_by) REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_mobile_staff_codes_active
+    ON mobile_staff_codes(user_id, revoked_at, expires_at);
+CREATE INDEX IF NOT EXISTS idx_mobile_staff_codes_hash
+    ON mobile_staff_codes(code_hash);
+CREATE TABLE IF NOT EXISTS mobile_devices (
+    device_id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    device_name TEXT NOT NULL DEFAULT '',
+    platform TEXT NOT NULL DEFAULT '',
+    app_version TEXT NOT NULL DEFAULT '',
+    secret_hash TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'approved'
+        CHECK (status IN ('approved', 'blocked')),
+    created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+    last_seen_at TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS mobile_parent_notification_reads (
+    student_nin TEXT NOT NULL,
+    attendance_id INTEGER NOT NULL,
+    read_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+    PRIMARY KEY (student_nin, attendance_id),
+    FOREIGN KEY (student_nin) REFERENCES students(student_nin) ON DELETE CASCADE,
+    FOREIGN KEY (attendance_id) REFERENCES attendance_logs(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS mobile_login_attempts (
+    scope TEXT NOT NULL,
+    address_hash TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    window_started_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+    PRIMARY KEY (scope, address_hash)
+);
+CREATE TABLE IF NOT EXISTS mobile_scan_receipts (
+    device_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    result_json TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+    PRIMARY KEY (device_id, client_id),
+    FOREIGN KEY (device_id) REFERENCES mobile_devices(device_id) ON DELETE CASCADE
+);
 """
 
 DEFAULT_PRINT_CONFIG = {

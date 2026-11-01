@@ -38,6 +38,9 @@
     <a href="#settings-sms">
       <svg class="ico"><use href="#i-message"></use></svg><span>رسائل SMS</span>
     </a>
+    <a href="#settings-mobile">
+      <svg class="ico"><use href="#i-phone"></use></svg><span>تطبيق الهاتف</span>
+    </a>
     <a href="#settings-data">
       <svg class="ico"><use href="#i-database"></use></svg><span>البيانات والنظام</span>
     </a>
@@ -547,6 +550,43 @@
           </button>
         </div>
       </form>
+    </section>
+
+    <section class="card settings-section" id="settings-mobile">
+      <div class="settings-card-head">
+        <div class="settings-head-icon"><svg class="ico"><use href="#i-phone"></use></svg></div>
+        <div class="flex-1">
+          <h2>رموز دخول تطبيق الهاتف</h2>
+          <p>أصدر رمزًا من 8 أرقام لموظف أو مدير لربط تطبيق TimeTrackEnterprise.</p>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <label class="field" for="mobile-staff-user">
+          <span>حساب المستخدم</span>
+          <select class="select" id="mobile-staff-user">
+            <option value="">جارٍ تحميل الحسابات…</option>
+          </select>
+        </label>
+        <div class="settings-actions" style="justify-content:flex-start">
+          <button class="btn btn-primary btn-sm" type="button" id="mobile-staff-code-issue" disabled>
+            <svg class="ico"><use href="#i-id-card"></use></svg>
+            <span>إصدار رمز جديد</span>
+          </button>
+        </div>
+        <div class="info-banner hidden" id="mobile-staff-code-result" aria-live="polite">
+          <svg class="ico"><use href="#i-shield-check"></use></svg>
+          <div class="flex-1">
+            <strong>رمز الموظف — احفظه وشاركه الآن</strong>
+            <p><code class="mono" id="mobile-staff-code" dir="ltr"></code></p>
+            <small id="mobile-staff-code-expiry"></small>
+          </div>
+          <button class="btn btn-secondary btn-sm" type="button" id="mobile-staff-code-copy">نسخ</button>
+        </div>
+        <div class="settings-note">
+          <svg class="ico"><use href="#i-info"></use></svg>
+          <div>إصدار رمز جديد يلغي الرمز السابق لهذا الحساب. الرمز صالح لمدة سنة، وتُحفظ بصمته الآمنة فقط ولا يمكن عرضه مرة أخرى بعد إغلاق هذه الصفحة.</div>
+        </div>
+      </div>
     </section>
 
     <section class="card settings-section" id="settings-updates">

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'gateway_rules.dart';
+
 /// HTTP error returned by the web backend.
 class MobileApiException implements Exception {
   const MobileApiException(
@@ -31,11 +32,11 @@ class MobileApi {
   MobileApi({
     required this.baseUrl,
     this.token = '',
-    this.version = '4.0.0',
+    this.version = '4.1.1',
     HttpClient? client,
   }) : _client = client ?? HttpClient();
 
-  static const String defaultVersion = '4.0.0';
+  static const String defaultVersion = '4.1.1';
   static const Duration connectTimeout = Duration(seconds: 12);
   static const Duration receiveTimeout = Duration(seconds: 64);
   static const int maxResponseBytes = 4 * 1024 * 1024;

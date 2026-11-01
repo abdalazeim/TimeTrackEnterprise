@@ -42,14 +42,13 @@ class GatewayPrefs {
   GatewaySettings settings() {
     final port = _prefs.getInt(_port) ?? GatewaySettings.defaultPort;
     return GatewaySettings(
-      port:
-          port < GatewaySettings.minPort || port > GatewaySettings.maxPort
-              ? GatewaySettings.defaultPort
-              : port,
+      port: port < GatewaySettings.minPort || port > GatewaySettings.maxPort
+          ? GatewaySettings.defaultPort
+          : port,
       apiKey: apiKey,
       pairPin: pairPin,
       deviceId: deviceId,
-      autoStart: _prefs.getBool(_autoStart) ?? false,
+      autoStart: _prefs.getBool(_autoStart) ?? true,
       keepAwake: _prefs.getBool(_keepAwake) ?? true,
     );
   }
@@ -93,7 +92,8 @@ class GatewayPrefs {
 
   Future<void> setPort(int port) async {
     if (port < GatewaySettings.minPort || port > GatewaySettings.maxPort) {
-      throw ArgumentError.value(port, 'port', 'Port must be between 1024 and 65535');
+      throw ArgumentError.value(
+          port, 'port', 'Port must be between 1024 and 65535');
     }
     await _prefs.setInt(_port, port);
   }
@@ -104,7 +104,8 @@ class GatewayPrefs {
   Future<void> setPairPin(String value) async {
     final trimmed = value.trim();
     if (trimmed.isNotEmpty && !RegExp(r'^\d{4}$').hasMatch(trimmed)) {
-      throw ArgumentError.value(value, 'pin', 'Pairing PIN must be four digits');
+      throw ArgumentError.value(
+          value, 'pin', 'Pairing PIN must be four digits');
     }
     await _prefs.setString(_pairPin, trimmed);
   }
@@ -205,7 +206,8 @@ class GatewayPrefs {
     return buffer.toString();
   }
 
-  static String generatePin() => _random.nextInt(10000).toString().padLeft(4, '0');
+  static String generatePin() =>
+      _random.nextInt(10000).toString().padLeft(4, '0');
 
   static String generateDeviceId() {
     final bytes = List<int>.generate(16, (_) => _random.nextInt(256));

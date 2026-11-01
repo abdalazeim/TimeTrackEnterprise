@@ -28,20 +28,24 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 
   final router = GoRouter(
-    initialLocation: Routes.splash,
+    initialLocation: Routes.gateway,
     refreshListenable: refresh,
     redirect: (context, state) {
       final status = ref.read(authControllerProvider).status;
       final location = state.matchedLocation;
+      final isGatewayRoute = location == Routes.gateway ||
+          location.startsWith('${Routes.gateway}/');
 
       switch (status) {
         case AuthStatus.unknown:
+          if (isGatewayRoute) return null;
           return location == Routes.splash ? null : Routes.splash;
         case AuthStatus.authenticated:
           return location == Routes.splash || location == Routes.login
               ? Routes.home
               : null;
         case AuthStatus.unauthenticated:
+          if (isGatewayRoute) return null;
           return location == Routes.login ? null : Routes.login;
       }
     },
@@ -65,10 +69,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.gateway,
         builder: (context, state) => const GatewayHomePage(),
-      ),
-      GoRoute(
-        path: Routes.gatewayScanner,
-        builder: (context, state) => const GatewayScannerPage(),
       ),
       GoRoute(
         path: Routes.gatewayScanner,
@@ -106,4 +106,3 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return router;
 });
-

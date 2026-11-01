@@ -63,7 +63,7 @@ class GatewaySettings {
       apiKey: (json['api_key'] as String?) ?? '',
       pairPin: (json['pair_pin'] as String?) ?? '',
       deviceId: (json['device_id'] as String?) ?? '',
-      autoStart: json['auto_start'] as bool? ?? false,
+      autoStart: json['auto_start'] as bool? ?? true,
       keepAwake: json['keep_awake'] as bool? ?? true,
     );
   }

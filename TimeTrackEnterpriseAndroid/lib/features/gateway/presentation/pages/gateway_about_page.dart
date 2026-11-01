@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/i18n/app_strings.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../shared/widgets/app_ui.dart';
+import '../../data/gateway_info.dart';
 
 class GatewayAboutPage extends StatelessWidget {
   const GatewayAboutPage({super.key});
@@ -28,30 +29,34 @@ class GatewayAboutPage extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate(<Widget>[
                 AppCard(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Attendance Gateway Companion',
+                        AppConfig.appName,
                         style: Theme.of(context)
                             .textTheme
                             .titleMedium
                             ?.copyWith(fontWeight: FontWeight.w800),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 8),
                       Text(
                         strings.isArabic
-                            ? 'äÙÇã ÈæÇÈÉ ÍÖæÑ ãÍáíÉ áÑÈØ ÃÌåÒÉ ÇáÍÖæÑ ÈÊØÈíÞ ÓØÍ ÇáãßÊÈ ÚÈÑ ÔÈßÉ Wi-Fi ÇáãÍáíÉ.'
-                            : 'Local attendance gateway system to connect attendance devices to the desktop app over local Wi-Fi.',
+                            ? 'Ø¨ÙˆØ§Ø¨Ø© Ù…Ø­Ù„ÙŠØ© Ù„Ø±Ø¨Ø· Ø£Ø¬Ù‡Ø²Ø© Ø§Ù„Ù…Ø³Ø­ ÙˆØ¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø±Ø³Ø§Ø¦Ù„ Ù…Ø¹ Ù†Ø¸Ø§Ù… TimeTrack Enterprise Ø¹Ø¨Ø± Ø§Ù„Ø´Ø¨ÙƒØ©.'
+                            : 'A local gateway for attendance scanners and SMS delivery on the TimeTrack Enterprise network.',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 16),
-                      const _InfoRow(label: 'Version', value: '4.1.1'),
+                      _InfoRow(
+                        label: strings.isArabic ? 'Ø§Ù„Ø¥ØµØ¯Ø§Ø±' : 'Version',
+                        value: GatewayInfo.version,
+                      ),
                       const Divider(height: 20),
                       _InfoRow(
-                        label: strings.isArabic ? 'ÇáÞÇáÈ' : 'Template',
-                        value: AppConfig.appName,
+                        label:
+                            strings.isArabic ? 'Ø§Ù„Ø®Ø§Ø¯Ù… Ø§Ù„Ù…Ø­Ù„ÙŠ' : 'Local server',
+                        value: 'HTTP Â· /health Â· /scans Â· /pair Â· /send',
                       ),
                     ],
                   ),
@@ -77,12 +82,15 @@ class _InfoRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Text(label, style: Theme.of(context).textTheme.bodyMedium),
-        Text(
-          value,
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(fontWeight: FontWeight.w700),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
+          ),
         ),
       ],
     );

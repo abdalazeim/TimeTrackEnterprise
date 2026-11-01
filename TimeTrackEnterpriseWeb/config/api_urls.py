@@ -7,6 +7,7 @@ call sites:
 ===============  ==========================  ==============================
 Prefix           Module                      Contents
 ===============  ==========================  ==============================
+``/api/mobile/``   ``apps.modules.mobile_api`` Flutter companion and parent portal
 ``/api/``        ``apps.modules.api_urls``   Functional API (legacy routes)
                                              (attendance, students, slips,
                                              messaging, reports, printing,
@@ -26,6 +27,8 @@ from __future__ import annotations
 from django.urls import include, path
 
 urlpatterns = [
+    # Flutter companion (device sessions, offline scans and parent portal).
+    path("mobile/", include("apps.modules.mobile_api_urls")),
     # Synchronisation hub (device tokens, idempotent push, conflict review).
     path("sync/", include("apps.synchronization.api_urls")),
     # Account/session endpoints.

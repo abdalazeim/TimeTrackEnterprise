@@ -137,6 +137,6 @@ It takes the same lock, so a second copy exits instead of duplicating work.
 
 `desktop/launcher.py` is the entry point of the packaged build: it applies
 `config.settings.desktop`, runs `migrate`, starts waitress, opens the browser
-and shows a native dialog on startup failure. `attendance.spec` bundles the
+and shows a native dialog on startup failure. `TimeTrackEnterprise.spec` bundles the
 templates, static files and locales. `config/desktop_security.py` restricts
 hosts, cookies and `/admin/` (loopback only).

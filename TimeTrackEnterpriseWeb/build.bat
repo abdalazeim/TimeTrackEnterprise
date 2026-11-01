@@ -19,7 +19,7 @@ echo [3/4] Generating the application icon...
 if errorlevel 1 goto :error
 
 echo [4/4] Building dist\TimeTrackEnterprise.exe...
-".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean attendance.spec
+".venv\Scripts\python.exe" -m PyInstaller --noconfirm --clean TimeTrackEnterprise.spec
 if errorlevel 1 goto :error
 
 echo.

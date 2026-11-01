@@ -1,5 +1,5 @@
 ﻿; Inno Setup 6.4+ — Smart Student Attendance distribution script
-; Build with: build_setup.bat  (or ISCC.exe installer\SmartAttendance.iss)
+; Build with: build_setup.bat  (or ISCC.exe installer\TimeTrackEnterprise.iss)
 
 #define MyAppName "TimeTrackEnterprise"
 #define MyAppVersion "1.1.20"
@@ -24,8 +24,8 @@ VersionInfoDescription=مثبت {#MyAppName}
 VersionInfoCopyright={#MyAppCopyright}
 VersionInfoProductName={#MyAppName}
 VersionInfoProductVersion={#MyAppVersion}
-; Preserve the legacy install directory for data and upgrade compatibility.
-DefaultDirName={autopf}\SmartAttendance
+; UsePreviousAppDir keeps existing installations and their data in place.
+DefaultDirName={autopf}\TimeTrackEnterprise
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 AllowNoIcons=yes

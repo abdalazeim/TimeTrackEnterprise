@@ -154,8 +154,11 @@ def _dib(size: int, pixels: list[tuple[int, int, int, int]]) -> bytes:
 def build_ico(path: Path) -> None:
     master = _master_pixels()
     entries: list[tuple[int, bytes]] = []
+    preview_pixels: list[tuple[int, int, int, int]] | None = None
     for size in SIZES:
         pixels = _downsample(master, size)
+        if size == 256:
+            preview_pixels = pixels
         entries.append((size, _png(size, pixels) if size >= 128 else _dib(size, pixels)))
 
     offset = 6 + 16 * len(entries)
@@ -170,8 +173,11 @@ def build_ico(path: Path) -> None:
 
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(bytes(directory) + bytes(payload))
+    if preview_pixels is not None:
+        path.with_suffix(".png").write_bytes(_png(256, preview_pixels))
 
 
 if __name__ == "__main__":
     build_ico(OUTPUT)
     print(f"Wrote {OUTPUT} ({OUTPUT.stat().st_size} bytes)")
+    print(f"Wrote {OUTPUT.with_suffix('.png')}")

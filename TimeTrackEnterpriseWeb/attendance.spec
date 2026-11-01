@@ -10,7 +10,7 @@ from pathlib import Path
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 ROOT = Path(SPECPATH)
-ICON = ROOT / "build_assets" / "attendance.ico"
+ICON = ROOT / "build_assets" / "TimeTrackEnterprise.ico"
 VERSION = ROOT / "build_assets" / "version_info.txt"
 
 datas = [

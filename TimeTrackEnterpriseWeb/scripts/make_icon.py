@@ -8,7 +8,7 @@ import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "build_assets" / "attendance.ico"
+OUTPUT = ROOT / "build_assets" / "TimeTrackEnterprise.ico"
 SIZES = (16, 24, 32, 48, 64, 128, 256)
 MASTER = 1024
 
@@ -45,7 +45,7 @@ def _master_pixels() -> list[tuple[int, int, int, int]]:
     radius = 226.0
     for y in range(MASTER):
         py = y + 0.5
-        ratio = (x_ratio := y / (MASTER - 1))
+        ratio = y / (MASTER - 1)
         background = (
             round(NAVY_TOP[0] + (TEAL_BOTTOM[0] - NAVY_TOP[0]) * ratio),
             round(NAVY_TOP[1] + (TEAL_BOTTOM[1] - NAVY_TOP[1]) * ratio),
@@ -65,7 +65,7 @@ def _master_pixels() -> list[tuple[int, int, int, int]]:
 
             if abs(clock_distance - clock_r) <= 24:
                 color = CLOCK_FACE
-            elif any(
+            elif clock_distance < clock_r and (any(
                 _segment_distance(px, py, *start, *end) <= width / 2
                 for start, end, width in (
                     ((clock_x, clock_y - 196), (clock_x, clock_y - 228), 16),
@@ -75,7 +75,7 @@ def _master_pixels() -> list[tuple[int, int, int, int]]:
                     ((clock_x, clock_y), minute_hand, 30),
                     ((clock_x, clock_y), hour_hand, 38),
                 )
-            ) or clock_distance <= 28:
+            ) or clock_distance <= 28):
                 color = CLOCK_FACE
 
             if badge_distance <= badge_r:

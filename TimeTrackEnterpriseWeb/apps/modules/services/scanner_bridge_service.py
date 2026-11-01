@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 
 import requests
 
-from apps.core.config import APP_VERSION
+from apps.core.config import APP_NAME, APP_VERSION
 from .sms_service import normalize_mobile_url
 
 _SCANS_TIMEOUT = 2.5
@@ -93,8 +93,8 @@ def reset(url: str = "") -> None:
 def _headers(api_key: str) -> dict[str, str]:
     headers = {
         "Accept": "application/json",
-        "User-Agent": f"SmartAttendance/{APP_VERSION}",
-        "X-Client-App": "SmartAttendance",
+        "User-Agent": f"{APP_NAME}/{APP_VERSION}",
+        "X-Client-App": APP_NAME,
         "Connection": "close",
     }
     if api_key:

@@ -319,8 +319,8 @@ def test_probe_gateway_reports_connected_with_identity_headers(monkeypatch):
     assert result["version"] == config.GATEWAY_APP_VERSION
     assert result["health_url"] == "http://192.168.1.50:8080/health"
     assert captured["url"] == result["health_url"]
-    assert captured["headers"]["X-Client-App"] == "SmartAttendance"
-    assert captured["headers"]["User-Agent"] == f"SmartAttendance/{config.APP_VERSION}"
+    assert captured["headers"]["X-Client-App"] == config.APP_NAME
+    assert captured["headers"]["User-Agent"] == f"{config.APP_NAME}/{config.APP_VERSION}"
 
 
 def test_probe_gateway_flags_outdated_version(monkeypatch):
@@ -612,10 +612,10 @@ def test_pair_gateway_exchanges_pin_for_api_key(monkeypatch):
     assert captured["url"] == "http://192.168.1.20:8080/pair"
     assert captured["json"] == {
         "pin": "2983",
-        "client": f"SmartAttendance/{config.APP_VERSION}",
+        "client": f"{config.APP_NAME}/{config.APP_VERSION}",
     }
-    assert captured["headers"]["X-Client-App"] == "SmartAttendance"
-    assert captured["headers"]["User-Agent"] == f"SmartAttendance/{config.APP_VERSION}"
+    assert captured["headers"]["X-Client-App"] == config.APP_NAME
+    assert captured["headers"]["User-Agent"] == f"{config.APP_NAME}/{config.APP_VERSION}"
     assert result["api_key"] == "paired-secret-key-123456"
     assert result["endpoint"] == "http://192.168.1.20:8080/send"
     assert result["pair_url"] == "http://192.168.1.20:8080/pair"

@@ -11,7 +11,7 @@ from urllib.parse import quote
 
 import requests
 
-from apps.core.config import APP_VERSION, WHATSAPP_DOWNLOAD_URL
+from apps.core.config import APP_NAME, APP_VERSION, WHATSAPP_DOWNLOAD_URL
 
 DEFAULT_COUNTRY_CODE = "213"
 MAX_CLOUD_BODY = 1024
@@ -214,7 +214,7 @@ def send_via_cloud(
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "User-Agent": f"SmartAttendance/{APP_VERSION}",
+        "User-Agent": f"{APP_NAME}/{APP_VERSION}",
     }
     timeout = max(5.0, min(float(timeout or 15.0), 60.0))
     try:

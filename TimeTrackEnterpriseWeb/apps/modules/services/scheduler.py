@@ -81,7 +81,7 @@ class GatewayHeartbeat(threading.Thread):
     """Keeps the phone gateway aware that the desktop app is online.
 
     The Android app shows a connection indicator based on the last request it
-    received from SmartAttendance, so idle desktops must still send a heartbeat.
+    received from TimeTrackEnterprise, so idle desktops must still send a heartbeat.
     """
 
     def __init__(self, app, interval: int = 25) -> None:

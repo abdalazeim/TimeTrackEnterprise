@@ -13,6 +13,7 @@ from urllib.parse import quote, urlparse
 import requests
 
 from apps.core.config import (
+    APP_NAME,
     APP_VERSION,
     GATEWAY_APP_DOWNLOAD_URL,
     GATEWAY_APP_NAME,
@@ -201,8 +202,8 @@ def probe_gateway(
     timeout = max(1.5, min(float(timeout or 4.0), 12.0))
     headers = {
         "Accept": "application/json",
-        "User-Agent": f"SmartAttendance/{APP_VERSION}",
-        "X-Client-App": "SmartAttendance",
+        "User-Agent": f"{APP_NAME}/{APP_VERSION}",
+        "X-Client-App": APP_NAME,
     }
     result: dict[str, Any] = {
         "status": "offline",
@@ -363,13 +364,13 @@ def pair_gateway(url: str, pin: Any, *, timeout: float = 8.0) -> dict[str, Any]:
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "User-Agent": f"SmartAttendance/{APP_VERSION}",
-        "X-Client-App": "SmartAttendance",
+        "User-Agent": f"{APP_NAME}/{APP_VERSION}",
+        "X-Client-App": APP_NAME,
     }
     try:
         response = requests.post(
             pair_url,
-            json={"pin": normalized_pin, "client": f"SmartAttendance/{APP_VERSION}"},
+            json={"pin": normalized_pin, "client": f"{APP_NAME}/{APP_VERSION}"},
             headers=headers,
             timeout=timeout,
             allow_redirects=False,
@@ -483,8 +484,8 @@ def send_via_gateway(settings: dict[str, str], phone: str, message: str) -> dict
         headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": f"SmartAttendance/{APP_VERSION}",
-            "X-Client-App": "SmartAttendance",
+            "User-Agent": f"{APP_NAME}/{APP_VERSION}",
+            "X-Client-App": APP_NAME,
         }
         if api_key:
             headers["X-Api-Key"] = api_key

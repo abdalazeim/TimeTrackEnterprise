@@ -1,6 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+title TimeTrackEnterprise
 
 rem ---------------------------------------------------------------------------
 rem TimeTrack Enterprise - local development / desktop launcher
@@ -27,7 +28,7 @@ echo [3/4] Applying database migrations...
 ".venv\Scripts\python.exe" manage.py migrate --noinput
 if errorlevel 1 goto :error
 
-echo [4/4] Starting TimeTrack Enterprise on network...
+echo [4/4] Starting TimeTrackEnterprise on the network...
 ".venv\Scripts\python.exe" desktop\launcher.py --host 0.0.0.0 --port 8765 %*
 exit /b %errorlevel%
 

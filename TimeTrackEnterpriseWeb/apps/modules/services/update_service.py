@@ -16,7 +16,7 @@ from urllib.request import Request, urlopen
 
 from apps.core.compat import current_app
 
-from apps.core.config import APP_VERSION, UPDATE_CHECK_INTERVAL, UPDATE_FEED_URL, UPDATE_PUBLIC_KEY
+from apps.core.config import APP_NAME, APP_VERSION, UPDATE_CHECK_INTERVAL, UPDATE_FEED_URL, UPDATE_PUBLIC_KEY
 from apps.core.db import bool_setting, get_db, get_settings
 from apps.core.update_signing import (
     MAX_ARTIFACT_BYTES,
@@ -71,7 +71,7 @@ def fetch_manifest(feed_url: str) -> dict:
     request = Request(
         feed_url,
         headers={
-            "User-Agent": f"SmartAttendance/{APP_VERSION}",
+            "User-Agent": f"{APP_NAME}/{APP_VERSION}",
             "Accept": "application/json",
             "Cache-Control": "no-cache",
         },
@@ -191,7 +191,7 @@ def _download_artifact(asset: dict, version: str) -> dict:
     part = target.with_suffix(target.suffix + ".part")
     request = Request(
         asset["url"],
-        headers={"User-Agent": f"SmartAttendance/{APP_VERSION}", "Accept": "application/octet-stream"},
+        headers={"User-Agent": f"{APP_NAME}/{APP_VERSION}", "Accept": "application/octet-stream"},
     )
     digest = hashlib.sha256()
     received = 0

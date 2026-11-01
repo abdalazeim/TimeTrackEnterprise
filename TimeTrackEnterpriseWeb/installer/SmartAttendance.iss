@@ -35,7 +35,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\dist
 OutputBaseFilename=TimeTrackEnterprise_Setup_{#MyAppVersion}
-SetupIconFile=..\build_assets\attendance.ico
+SetupIconFile=..\build_assets\TimeTrackEnterprise.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 UninstallDisplayName={#MyAppName}
 Compression=lzma2/max
@@ -58,6 +58,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "{#SourceExe}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\README.md"; DestDir: "{app}"; DestName: "README.md"; Flags: ignoreversion
+
+[InstallDelete]
+; Remove the legacy binary when upgrading in place; keep its data directory.
+Type: files; Name: "{app}\SmartAttendance.exe"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Comment: "{#MyAppName}"

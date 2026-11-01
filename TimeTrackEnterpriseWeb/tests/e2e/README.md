@@ -11,7 +11,7 @@ process, so they are **not** collected by `pytest` (see `norecursedirs` in
 
 ## Manual checklist
 
-Run the desktop build (`run.bat` or `dist/SmartAttendance.exe`) and verify:
+Run the desktop build (`run.bat` or `dist/TimeTrackEnterprise.exe`) and verify:
 
 1. **Login** — the seeded `admin` account opens without a password; changing
    the password forces the new one.

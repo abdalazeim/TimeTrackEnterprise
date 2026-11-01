@@ -43,7 +43,7 @@ def build_manifest(private, version="9.9.9", payload=b"exe-bytes", kind="portabl
                 "url": f"https://fetsync.org/Update/builds/{kind}.exe",
                 "sha256": hashlib.sha256(payload).hexdigest(),
                 "size": len(payload),
-                "name": "SmartAttendance.exe",
+                "name": "TimeTrackEnterprise.exe",
             }
         ],
     }

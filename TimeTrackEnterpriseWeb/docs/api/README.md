@@ -188,11 +188,11 @@ for each login scope. When deployed behind a reverse proxy, enable
 Docker/Nginx stack does this and the web container is not publicly published.
 Never enable it for a direct server that accepts client traffic itself.
 
-Hosted Android clients must use HTTPS. The current Android manifest does not
-declare cleartext HTTP access, so the local desktop URL requires a reviewed
-Android LAN transport configuration or a trusted HTTPS endpoint. The phone's
-local SMS/scan gateway is a separate inbound service: a desktop on the same LAN
-can reach it, but a hosted server cannot reach a phone's private address without
+Hosted Android clients must use HTTPS. The Android app permits cleartext HTTP
+for LAN use, and its server URL validation restricts HTTP API targets to
+localhost/private addresses; use it only on a trusted LAN. The phone's local
+SMS/scan gateway is a separate inbound service: a desktop on the same LAN can
+reach it, but a hosted server cannot reach a phone's private address without
 VPN/tunneling or an outbound relay design. FCM push delivery is not implemented;
 the app reads stored notifications when opened.
 

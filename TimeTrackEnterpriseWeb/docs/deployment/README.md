@@ -229,10 +229,9 @@ error instead of duplicating work.
 `TimeTrackEnterpriseAndroid/` is the Flutter companion. For a desktop/LAN
 server, start the desktop launcher on the school computer, use the printed
 `http://<LAN-IP>:<PORT>` address, and keep the phone on the same reachable LAN.
-The current Android manifest does not declare cleartext HTTP access. If Android
-rejects that LAN URL, this build needs a reviewed app-level LAN transport
-configuration or a trusted HTTPS endpoint on the school network; entering the
-IP alone cannot override Android's transport policy.
+The Android app permits cleartext HTTP for LAN use. Enter HTTP only for a
+trusted private network; use HTTPS for public hosting. The app's server URL
+validation restricts HTTP API targets to localhost/private addresses.
 For hosting, use the public HTTPS origin (for example
 `https://attendance.example.org`) and include its hostname in
 `ATTENDANCE_ALLOWED_HOSTS`; the Android client rejects public HTTP URLs and

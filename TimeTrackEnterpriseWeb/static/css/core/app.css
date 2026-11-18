@@ -116,6 +116,7 @@
 
   --on-dark-primary: #C7D2FE;
   --on-dark-primary-soft: rgba(199, 210, 254, 0.14);
+  --font-ui: "Cairo", "Segoe UI", "Dubai", "Noto Kufi Arabic", "Tahoma", Arial, sans-serif;
 }
 
 /* ---------- Color themes ---------- */

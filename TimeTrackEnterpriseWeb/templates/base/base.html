@@ -130,6 +130,10 @@
             <span>مسح سريع</span>
             <kbd>F2</kbd>
           </a>
+          <div class="search-wrapper" style="display: flex; align-items: center; margin-left: 1rem;">
+            <input type="text" id="quick-search" placeholder="بحث..." class="input input-sm" style="width: 200px; margin-right: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg-soft); color: var(--text); font-size: 0.85rem;">
+            <svg class="ico ico-search" style="width: 18px; height: 18px; color: var(--text-muted); margin-right: 0.3rem;"><use href="#i-search"></use></svg>
+          </div>
           <div class="user-chip" title="{{ current_user.display_name }} — {{ role_label }}">
             <span class="user-avatar" aria-hidden="true">{{ current_user.display_name[:1] }}</span>
             <span class="user-meta">

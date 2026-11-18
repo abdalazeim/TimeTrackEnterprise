@@ -73,73 +73,39 @@
 
   <div class="dash-main mt-3">
     <div class="stack">
+      <!-- Chart: Daily Attendance Trend -->
       <section class="card">
         <div class="card-header">
           <div>
-            <h2><svg class="ico"><use href="#i-chart"></use></svg> نظرة على الفترة</h2>
-            <p>نسبة الحضور الإجمالية ومؤشرات المسح</p>
+            <h2><svg class="ico"><use href="#i-chart"></use></svg> اتجاه الحضور اليومي</h2>
+            <p>نسبة الحضور والغياب خلال الأسبوع الحالي</p>
           </div>
-          <div class="periodizer" id="dash-period-pills"></div>
         </div>
         <div class="card-body">
-          <div class="donut-wrap">
-            <div class="donut" id="dash-donut" style="--value:0">
-              <div class="donut-center">
-                <strong id="dash-donut-value">0%</strong>
-                <span>نسبة الحضور</span>
-              </div>
-            </div>
-            <div class="donut-legend">
-              <div class="legend-row is-present"><i></i> حاضر <span id="legend-present">0</span></div>
-              <div class="legend-row is-late"><i></i> متأخر <span id="legend-late">0</span></div>
-              <div class="legend-row is-absent"><i></i> غائب <span id="legend-absent">0</span></div>
-              <div class="legend-row is-excused"><i></i> مبرر <span id="legend-excused">0</span></div>
-              <div class="divider" style="margin:4px 0"></div>
-              <div class="legend-row"><i style="background:var(--text-muted)"></i> لم يُمسح بعد <span id="legend-unscanned">0</span></div>
-            </div>
-            <div style="flex:1;min-width:180px;display:grid;gap:10px">
-              <div class="flex between">
-                <span class="tiny muted">حالة الفترة</span>
-                <span id="dash-closure-status" class="badge">—</span>
-              </div>
-              <div class="progress-row">
-                <div class="row-head"><strong>اكتمال المسح</strong><span id="scan-progress-label">0 / 0</span></div>
-                <div class="progress"><span id="scan-progress-bar" style="width:0%"></span></div>
-              </div>
-              <div class="progress-row">
-                <div class="row-head"><strong>رسائل الغياب</strong><span id="sms-progress-label">0</span></div>
-                <div class="progress is-warning"><span id="sms-progress-bar" style="width:0%"></span></div>
-              </div>
-              <div class="mini-stats">
-                <div class="mini-stat is-present"><strong id="mini-present">0</strong><span>حاضر</span></div>
-                <div class="mini-stat is-late"><strong id="mini-late">0</strong><span>متأخر</span></div>
-                <div class="mini-stat"><strong id="mini-total">0</strong><span>نشط</span></div>
-              </div>
-            </div>
-          </div>
+          <canvas id="attendanceTrendChart" height="120" style="height: 120px !important;"></canvas>
         </div>
       </section>
 
+      <!-- Chart: Attendance by Section -->
       <section class="card">
         <div class="card-header">
           <div>
             <h2><svg class="ico"><use href="#i-users"></use></svg> الحضور حسب الأقسام</h2>
             <p>مقارنة سريعة بين الأقسام في الفترة المحددة</p>
           </div>
-          <a class="btn btn-ghost btn-sm" href="{{ url_for('views.attendance_page') }}">عرض السجل <svg class="ico"><use href="#i-arrow-left"></use></svg></a>
         </div>
         <div class="card-body" id="class-breakdown">
           <div class="loading-state"><span class="spinner"></span><span>جارٍ تحميل إحصاءات الأقسام…</span></div>
         </div>
       </section>
 
+      <!-- Recent Scans -->
       <section class="card">
         <div class="card-header">
           <div>
             <h2><svg class="ico"><use href="#i-scan"></use></svg> آخر عمليات المسح</h2>
             <p>أحدث التلاميذ الذين سُجّل وصولهم في هذه الفترة</p>
           </div>
-          <a class="btn btn-ghost btn-sm" href="{{ url_for('views.gate_page') }}">البوابة <svg class="ico"><use href="#i-arrow-left"></use></svg></a>
         </div>
         <div class="card-body" id="recent-scans">
           <div class="loading-state"><span class="spinner"></span><span>جارٍ التحميل…</span></div>
@@ -176,10 +142,7 @@
 
       <section class="card">
         <div class="card-header">
-          <div>
-            <h2><svg class="ico"><use href="#i-warning"></use></svg> غيابات تحتاج متابعة</h2>
-            <p id="absentee-subtitle">آخر الحالات غير المعالجة</p>
-          </div>
+          <div><h2><svg class="ico"><use href="#i-warning"></use></svg> غيابات تحتاج متابعة</h2></div>
           <span class="badge badge--absent" id="absentee-count">0</span>
         </div>
         <div class="card-body">
@@ -200,8 +163,7 @@
 
       <section class="card">
         <div class="card-header">
-          <div><h2><svg class="ico"><use href="#i-message"></use></svg> حالة إشعارات الأولياء</h2></div>
-          <a class="btn btn-ghost btn-sm" href="{{ url_for('views.attendance_page') }}#sms">سجل الرسائل</a>
+          <div><h2><svg class="ico"><use href="#i-message"></use></svg> حالة إشعارات الأولياء</h2></a>
         </div>
         <div class="card-body">
           <div class="sms-summary-strip" style="margin-bottom:12px">
@@ -241,6 +203,7 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{{ url_for('static', filename='js/modules/absence-workflow.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/pages/dashboard.js') }}"></script>
+  <!-- Chart.js for analytics charts -->
+  <script src="{{ url_for('static', filename='js/vendors/chart.min.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/pages/dashboard.js') }}" defer></script>
 {% endblock %}

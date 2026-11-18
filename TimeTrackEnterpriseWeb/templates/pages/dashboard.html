@@ -37,37 +37,37 @@
   </section>
 
   <div class="stats-grid" aria-label="مؤشرات الحضور">
-    <article class="stat-card is-present">
-      <div class="stat-top">
-        <span class="stat-icon"><svg class="ico"><use href="#i-check"></use></svg></span>
-        <span class="stat-trend">في الوقت</span>
+    <article class="stat-card is-present" style="--card-bg: var(--primary-soft); --icon-color: var(--primary); --text-color: var(--primary);">
+      <div class="stat-top" style="background: var(--card-bg); color: var(--icon-color);">
+        <span class="stat-icon"><svg class="ico" style="color: var(--icon-color);"><use href="#i-check"></use></svg></span>
+        <span class="stat-trend" style="color: var(--icon-color);">في الوقت</span>
       </div>
-      <div class="stat-value" id="stat-present">—</div>
-      <div class="stat-label">الحاضرون</div>
+      <div class="stat-value" id="stat-present" style="color: var(--primary);">—</div>
+      <div class="stat-label" style="color: var(--primary);">الحاضرون</div>
     </article>
-    <article class="stat-card is-late">
-      <div class="stat-top">
-        <span class="stat-icon"><svg class="ico"><use href="#i-clock"></use></svg></span>
-        <span class="stat-trend">بعد الحد</span>
+    <article class="stat-card is-late" style="--card-bg: #F0F4FC; --icon-color: var(--accent); --text-color: var(--accent);">
+      <div class="stat-top" style="background: var(--card-bg); color: var(--icon-color);">
+        <span class="stat-icon"><svg class="ico" style="color: var(--icon-color);"><use href="#i-clock"></use></svg></span>
+        <span class="stat-trend" style="color: var(--icon-color);">بعد الحد</span>
       </div>
-      <div class="stat-value" id="stat-late">—</div>
-      <div class="stat-label">المتأخرون</div>
+      <div class="stat-value" id="stat-late" style="color: var(--accent);">—</div>
+      <div class="stat-label" style="color: var(--accent);">المتأخرون</div>
     </article>
-    <article class="stat-card is-absent">
-      <div class="stat-top">
-        <span class="stat-icon"><svg class="ico"><use href="#i-warning"></use></svg></span>
-        <span class="stat-trend" id="sms-alert-badge">SMS</span>
+    <article class="stat-card is-absent" style="--card-bg: #F4F6FC; --icon-color: var(--danger); --text-color: var(--danger);">
+      <div class="stat-top" style="background: var(--card-bg); color: var(--icon-color);">
+        <span class="stat-icon"><svg class="ico" style="color: var(--icon-color);"><use href="#i-warning"></use></svg></span>
+        <span class="stat-trend" style="color: var(--icon-color);">SMS</span>
       </div>
-      <div class="stat-value" id="stat-absent">—</div>
-      <div class="stat-label">الغائبون</div>
+      <div class="stat-value" id="stat-absent" style="color: var(--danger);">—</div>
+      <div class="stat-label" style="color: var(--danger);">الغائبون</div>
     </article>
-    <article class="stat-card is-excused">
-      <div class="stat-top">
-        <span class="stat-icon"><svg class="ico"><use href="#i-shield-check"></use></svg></span>
-        <span class="stat-trend">مبرر</span>
+    <article class="stat-card is-excused" style="--card-bg: #EBF0FD; --icon-color: var(--info); --text-color: var(--info);">
+      <div class="stat-top" style="background: var(--card-bg); color: var(--icon-color);">
+        <span class="stat-icon"><svg class="ico" style="color: var(--icon-color);"><use href="#i-shield-check"></use></svg></span>
+        <span class="stat-trend" style="color: var(--icon-color);">مبرر</span>
       </div>
-      <div class="stat-value" id="stat-excused">—</div>
-      <div class="stat-label">الغياب المبرر</div>
+      <div class="stat-value" id="stat-excused" style="color: var(--info);">—</div>
+      <div class="stat-label" style="color: var(--info);">الغياب المبرر</div>
     </article>
   </div>
 
